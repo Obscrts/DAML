@@ -1,3 +1,49 @@
 ---
+# Headline
 title: "Hotel-Indoor-Analyse"
+author: 
+  name: "Cedric Klöpsch"
+  affiliations: "FHDW & Telekom"
+date: today
+
+title-block-banner: "#E20075"
+title-block-banner-color: "#FFFFFF"
+
+description: "Hier könnte ihre Werbung stehen"
+
+# Formatting
+lang: "DE"
+format:
+  html:
+    toc: true
+    toc-title: Inhaltsverzeichnis 
+    toc-float: true
+    toc-depth: 2
+    toc-expand: 2
+    number-sections: true
+    smooth-scroll: true
+  pdf:
+    toc: true
+    toc-title: Inhaltsverzeichnis 
+    toc-float: true
+    toc-depth: 2
+    toc-expand: 2
+    number-sections: true
+    smooth-scroll: true
+  
+jupyter: python3
 ---
+
+```{python}
+#| label: setup - importing libraries
+#| include: false
+import os
+import pandas as pd
+```
+
+# Einleitung
+## Aufgabenstellung
+## Datenquelle
+## Thesen
+
+# Explorative Datenanalyse

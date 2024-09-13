@@ -37,8 +37,9 @@ jupyter: python3
 ```{python}
 #| label: setup - importing libraries
 #| include: false
-import os
 import pandas as pd
+import numpy as np
+import os
 ```
 
 # Einleitung

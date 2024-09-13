@@ -1,6 +1,9 @@
 /.quarto/
 /*_files
+/.venv
 
 *.html
 *.tex
 *.log
+
+*.quarto_ipynb

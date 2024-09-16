@@ -1,15 +1,15 @@
 ---
 # Headline
-title: "Hotel-Indoor-Analyse"
+title: "<img src='resources/images/logo/telekom.png' style='width: 100px; height: auto;'> Hotel Indoor Analyse <img src='resources/images/logo/fhdw.png' style='width: 100px; height: auto;'>"
 author: 
   name: "Cedric Klöpsch"
   affiliations: "FHDW & Telekom"
 date: today
 
-title-block-banner: "#E20075"
-title-block-banner-color: "#FFFFFF"
+title-block-banner: "#FFFFFF"
+title-block-banner-color: "#E20075"
 
-description: "Hier könnte ihre Werbung stehen"
+# description: ""
 
 # Formatting
 lang: "DE"
@@ -30,7 +30,6 @@ format:
     toc-expand: 2
     number-sections: true
     smooth-scroll: true
-  
 jupyter: python3
 ---
 
@@ -43,8 +42,12 @@ import os
 ```
 
 # Einleitung
+
 ## Aufgabenstellung
+
 ## Datenquelle
+### Herkunft der Daten
+
 ## Thesen
 
 # Explorative Datenanalyse

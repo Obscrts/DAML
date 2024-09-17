@@ -1,6 +1,8 @@
-/.quarto/
-/*_files
 /.venv
+.quarto/
+/*_files
+
+resources/data
 
 *.html
 *.tex

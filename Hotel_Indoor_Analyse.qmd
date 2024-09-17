@@ -39,9 +39,8 @@ format:
 jupyter: python3
 ---
 
-
-# | Datensatz
-Eine kurze Einführung in den Datensatz, einschließlich einer Übersicht über die verfügbaren Städte (z. B. Berlin, Köln) und der enthaltenen Mobilfunkdaten (Timing Advance, RSRP, RSRQ usw.).
+# | Überblick über den Datensatz
+Die Daten stammen aus dem Mobilfunknetz der Deutschen Telekom und wurden mit dem NitroGEO-Tool von Viavi extrahiert. Es handelt sich um Mobilfunkdaten, die vom Tool als "Indoor" klassifiziert wurden, was bedeutet, dass die jeweiligen Endnutzergeräte zum Zeitpunkt der Erfassung mit hoher Wahrscheinlichkeit innerhalb eines Gebäudes waren. Der Datensatz umfasst mehrere große deutsche Städte, die Austragungsorte der Fußball-Europameisterschaft 2024 sind: Berlin, Köln, Dortmund, Düsseldorf, Frankfurt am Main, Gelsenkirchen, Hamburg, Leipzig, München und Stuttgart. Die enthaltenen Messwerte umfassen wichtige Metriken wie Timing Advance, RSRP (Reference Signal Received Power) und RSRQ (Reference Signal Received Quality), die Aufschluss über die Signalqualität und Reichweite innerhalb von Gebäuden geben. Eine detaillierte Erklärung dieser und weiterer Metriken erfolgt im weiteren Verlauf der Analyse.
 
 # | Erste Betrachtung der Daten
 ## Imports

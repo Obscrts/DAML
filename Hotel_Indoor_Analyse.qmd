@@ -67,7 +67,35 @@ import os
 ```
 
 ## Einlesen des Datensatzes
-Laden der CSV-Dateien, Zusammenführen der Datensätze, falls nötig, und erste Übersicht über die Daten.
+Der erste Schritt in der Analyse besteht darin, die Daten aus den verschiedenen CSV-Dateien einzulesen, die Informationen aus mehreren deutschen Städten enthalten. Jede Stadt wird durch eine eigene CSV-Datei repräsentiert. Die Daten werden in separaten DataFrames gespeichert, die bei Bedarf zu einem einzigen DataFrame zusammengeführt werden können, um eine einheitliche Analyse zu ermöglichen.
+
+```{python}
+#| label: load_data
+#| include: true
+
+# Pfade zu den CSV-Dateien der verschiedenen Städte
+files = {
+    'BER': 'resources/data/normal/geo_export_mvp_BER.csv',
+    'CGN': 'resources/data/normal/geo_export_mvp_CGN.csv',
+    'DOR': 'resources/data/normal/geo_export_mvp_DOR.csv',
+    'DUS': 'resources/data/normal/geo_export_mvp_DUS.csv',
+    'FFM': 'resources/data/normal/geo_export_mvp_FFM.csv',
+    'GEL': 'resources/data/normal/geo_export_mvp_GEL.csv',
+    'HH': 'resources/data/normal/geo_export_mvp_HH.csv',
+    'LPZ': 'resources/data/normal/geo_export_mvp_LPZ.csv',
+    'MUC': 'resources/data/normal/geo_export_mvp_MUC.csv',
+    'STG': 'resources/data/normal/geo_export_mvp_STG.csv'
+}
+
+# Laden der Daten in einzelne DataFrames
+dataframes = {city: pd.read_csv(path) for city, path in files.items()}
+
+# Optional: Zusammenführen aller DataFrames zu einem einzigen DataFrame
+combined_df = pd.concat(dataframes.values(), ignore_index=True)
+
+# Anzeigen der ersten Zeilen des kombinierten Datensatzes
+combined_df.head()
+```
 
 ## Erste Betrachtung des Datensatzes
 Anzeigen der ersten Zeilen des Datensatzes und der allgemeinen statistischen Informationen wie Mittelwert, Minimum und Maximum.

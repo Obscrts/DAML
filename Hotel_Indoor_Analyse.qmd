@@ -1,6 +1,8 @@
 ---
 # Headline
-title: "<img src='resources/images/logo/telekom.png' style='width: 120px; height: auto;'> <span style='padding-left: 100px; padding-right: 100px;'>Hotel Indoor Analyse</span> <img src='resources/images/logo/fhdw.png' style='width: 120px; height: auto;'>"
+title: "<img src='resources/images/logo/telekom.png' style='width: 200px; height: auto; padding-left: 100px;'> 
+<span style='padding-left: 75px; padding-right: 75px;'>Hotel Indoor Analyse</span> 
+<img src='resources/images/logo/fhdw.png' style='width: 120px; height: auto;'>"
 author: 
   name: "Cedric Klöpsch"
   affiliations: " Telekom & FHDW"

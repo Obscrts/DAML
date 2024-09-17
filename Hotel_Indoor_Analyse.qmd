@@ -36,106 +36,71 @@ format:
     smooth-scroll: true
     code-fold: true
     code-summary: "Code anzeigen"
+execute:
+  echo: false
+  eval: true
+  output: true
+  warning: false
+  error: false
+  embed: false
 jupyter: python3
 ---
 
 # | Überblick über den Datensatz
-Die Daten stammen aus dem Mobilfunknetz der Deutschen Telekom und wurden mit dem NitroGEO-Tool von Viavi extrahiert. Es handelt sich um Mobilfunkdaten, die vom Tool als "Indoor" klassifiziert wurden, was bedeutet, dass die jeweiligen Endnutzergeräte zum Zeitpunkt der Erfassung mit hoher Wahrscheinlichkeit innerhalb eines Gebäudes waren. Der Datensatz umfasst mehrere große deutsche Städte, die Austragungsorte der Fußball-Europameisterschaft 2024 sind: Berlin, Köln, Dortmund, Düsseldorf, Frankfurt am Main, Gelsenkirchen, Hamburg, Leipzig, München und Stuttgart. Die enthaltenen Messwerte umfassen wichtige Metriken wie Timing Advance, RSRP (Reference Signal Received Power) und RSRQ (Reference Signal Received Quality), die Aufschluss über die Signalqualität und Reichweite innerhalb von Gebäuden geben. Eine detaillierte Erklärung dieser und weiterer Metriken erfolgt im weiteren Verlauf der Analyse.
+Die Daten stammen aus dem Mobilfunknetz der Deutschen Telekom und wurden mit dem NitroGEO-Tool von Viavi extrahiert. Es handelt sich um Mobilfunkdaten, die vom Tool als "Indoor" klassifiziert wurden, was bedeutet, dass die jeweiligen Endnutzergeräte zum Zeitpunkt der Erfassung mit hoher Wahrscheinlichkeit innerhalb eines Gebäudes waren. Der Datensatz umfasst mehrere große deutsche Städte, die Austragungsorte der Fußball-Europameisterschaft 2024 waren: Berlin, Köln, Dortmund, Düsseldorf, Frankfurt am Main, Gelsenkirchen, Hamburg, Leipzig, München und Stuttgart. Die enthaltenen Messwerte umfassen wichtige Metriken wie Timing Advance, RSRP (Reference Signal Received Power) und RSRQ (Reference Signal Received Quality), die Aufschluss über die Signalqualität und Reichweite innerhalb von Gebäuden geben. Eine detaillierte Erklärung dieser und weiterer Metriken erfolgt im weiteren Verlauf der Analyse.
 
 # | Erste Untersuchung des Datensatzes
-In diesem Kapitel wird der Datensatz erstmals genauer betrachtet, um einen grundlegenden Überblick über die Struktur und den Inhalt zu gewinnen. Zunächst werden die benötigten Python-Bibliotheken importiert und der Datensatz eingelesen. Anschließend erfolgt eine erste Sichtung der Daten durch die Darstellung der ersten Zeilen sowie statistischer Kennzahlen wie Mittelwert, Minimum und Maximum. Zusätzlich wird untersucht, ob und in welchem Ausmaß fehlende Werte (NA’s) vorhanden sind, und es werden Maßnahmen zur Bereinigung oder Imputation dieser Werte vorgeschlagen. Zudem erfolgt eine kurze Beschreibung der wichtigsten Spalten im Datensatz, um deren Bedeutung im Kontext der Mobilfunkdaten zu klären. Abschließend werden erste Visualisierungen der numerischen Daten vorgenommen, um ein besseres Verständnis für deren Verteilung und mögliche Besonderheiten zu gewinnen.
-
-## Importierte Bibiliotheken
-Für die Analyse dieses Datensatzes werden verschiedene Python-Bibliotheken benötigt, die essenzielle Funktionen zur Datenverarbeitung und -visualisierung bereitstellen. Zu den wichtigsten Bibliotheken zählen:
-
-- **pandas**: Eine leistungsstarke Bibliothek zur Datenmanipulation und -analyse. Sie wird verwendet, um Daten aus CSV-Dateien zu laden und in einem DataFrame-Format darzustellen, das eine effiziente Analyse ermöglicht.
-- **numpy**: Diese Bibliothek bietet mathematische Funktionen für numerische Operationen und unterstützt insbesondere bei der Verarbeitung großer Datenmengen und Arrays.
-- **matplotlib**: Diese Bibliothek wird für die Erstellung von Visualisierungen verwendet. Sie ermöglicht es, Diagramme, Graphen und andere Darstellungen der Daten zu erzeugen, um Muster oder Anomalien zu erkennen.
-- **seaborn**: Aufbauend auf matplotlib erleichtert seaborn das Erstellen ansprechender und informativer statistischer Visualisierungen und bietet weitergehende Funktionalitäten für die Visualisierung von Datenverteilungen und -beziehungen.
-- **os**: Diese Bibliothek dient zur Interaktion mit dem Betriebssystem, insbesondere zum Navigieren in Dateistrukturen und Arbeiten mit Dateipfaden, was bei der Verwaltung und dem Zugriff auf die CSV-Dateien hilfreich ist.
-
-Der folgende Code-Block zeigt den Import der oben genannten Bibliotheken:
-
-```{python}
-#| label: setup - importing libraries
-#| include: true
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sb
-import os
-```
+## Importierte Bibliotheken
+Auflistung der benötigten Python-Bibliotheken, z.B. `pandas`, `numpy`, `geopandas`, `matplotlib` usw.
 
 ## Einlesen des Datensatzes
-Der erste Schritt in der Analyse besteht darin, die Daten aus den verschiedenen CSV-Dateien einzulesen, die Informationen aus mehreren deutschen Städten enthalten. Jede Stadt wird durch eine eigene CSV-Datei repräsentiert. Die Daten werden in separaten DataFrames gespeichert, die bei Bedarf zu einem einzigen DataFrame zusammengeführt werden können, um eine einheitliche Analyse zu ermöglichen.
-
-```{python}
-#| label: load_data
-#| include: true
-
-# Pfade zu den CSV-Dateien der verschiedenen Städte
-files = {
-    'BER': 'resources/data/normal/geo_export_mvp_BER.csv',
-    'CGN': 'resources/data/normal/geo_export_mvp_CGN.csv',
-    'DOR': 'resources/data/normal/geo_export_mvp_DOR.csv',
-    'DUS': 'resources/data/normal/geo_export_mvp_DUS.csv',
-    'FFM': 'resources/data/normal/geo_export_mvp_FFM.csv',
-    'GEL': 'resources/data/normal/geo_export_mvp_GEL.csv',
-    'HH': 'resources/data/normal/geo_export_mvp_HH.csv',
-    'LPZ': 'resources/data/normal/geo_export_mvp_LPZ.csv',
-    'MUC': 'resources/data/normal/geo_export_mvp_MUC.csv',
-    'STG': 'resources/data/normal/geo_export_mvp_STG.csv'
-}
-
-# Laden der Daten in einzelne DataFrames
-dataframes = {city: pd.read_csv(path) for city, path in files.items()}
-
-# Optional: Zusammenführen aller DataFrames zu einem einzigen DataFrame
-combined_df = pd.concat(dataframes.values(), ignore_index=True)
-
-# Anzeigen der ersten Zeilen des kombinierten Datensatzes
-combined_df.head()
-```
+Schrittweise Erklärung des Einlesens der Hotel-, buffered Polygons- und GeoJSON-Daten.
 
 ## Erste Betrachtung des Datensatzes
-Anzeigen der ersten Zeilen des Datensatzes und der allgemeinen statistischen Informationen wie Mittelwert, Minimum und Maximum.
+Anzeigen der ersten Zeilen der Daten, um die Struktur zu verstehen.
 
 ## Finden von NA’s
-Ermitteln von fehlenden Werten im Datensatz und Überlegung, wie mit diesen umgegangen werden soll (z.B. Imputation oder Entfernen).
+Ermitteln von fehlenden Werten in den Datensätzen.
+
+## Umgang mit fehlenden Werten
+Behandlung der fehlenden Werte (z.B. durch Imputation oder Entfernung).
 
 ## Beschreibung der Spalten
-Kurze Beschreibung der wichtigsten Spalten im Datensatz, z.B. was RSRP, RSRQ und Timing Advance darstellen.
+Detaillierte Beschreibung der wichtigsten Spalten, z.B. RSRP, RSRQ, TA, sowie zusätzliche Metriken aus den buffered Polygons und GeoJSON-Daten.
 
-## Visualisierung der numerischen Daten
-Erste Visualisierungen wie Histogramme und Boxplots, um die Verteilung der numerischen Daten zu analysieren.
+# | Vergleich der Datensätze
+## Vergleich der Hotel- und buffered Polygons-Daten
+Untersuchung der Unterschiede zwischen den Daten aus den echten Hotelpolygone und den buffered Polygons.
 
-# | Form und Verwendung der Daten
-## Datenaufbereitung
-Vorbereiten der Daten für die Analyse, einschließlich Behandlung fehlender Werte, Normalisierung und Aggregation der Daten.
+## Korrelation zwischen TA und RSRP/RSRQ
+Untersuchung der Korrelation zwischen Timing Advance (TA) und den Signalqualitätsmetriken (RSRP/RSRQ) in beiden Datensätzen.
+
+## Statistischer Vergleich
+Vergleich der Mittelwerte, Mediane und Standardabweichungen der relevanten Metriken in den beiden Datensätzen.
 
 # | Explorative Datenanalyse (EDA)
 ## Univariate Analyse
-Analyse einzelner Variablen wie RSRP und RSRQ, um deren Verteilung und mögliche Ausreißer zu verstehen.
+Untersuchung der Verteilung einzelner Variablen in den Datensätzen, z.B. Histogramme und Boxplots für TA, RSRP und RSRQ.
 
 ## Bivariate Analyse
-Untersuchung der Beziehungen zwischen zwei Variablen, z.B. Korrelation zwischen Timing Advance und RSRP, mithilfe von Scatterplots oder Heatmaps.
+Untersuchung der Zusammenhänge zwischen zwei Variablen, z.B. Scatterplots zur Analyse der Korrelation zwischen TA und RSRP/RSRQ.
 
 ## Multivariate Analyse
-Erweiterte Analyse der Daten durch Untersuchung der Wechselwirkungen zwischen mehreren Variablen, z.B. mithilfe von PCA oder anderen statistischen Methoden.
+Untersuchung von Wechselwirkungen zwischen mehreren Variablen und Einsatz fortgeschrittener statistischer Methoden wie PCA (Principal Component Analysis) oder Regressionsmodelle.
 
 # | Modellierung und Vorhersagen
 ## Zielvariable festlegen
-Auswahl der Variablen, die vorhergesagt oder modelliert werden sollen, z.B. RSRP oder RSRQ.
+Bestimmung der zu modellierenden Zielvariable, z.B. RSRP oder RSRQ.
 
 ## Modellauswahl
-Auswahl geeigneter Machine-Learning-Modelle wie lineare Regression oder Entscheidungsbäume.
+Auswahl geeigneter Machine-Learning-Modelle wie lineare Regression, Entscheidungsbäume oder Random Forest.
 
 ## Modelltraining und Evaluierung
-Trainieren der Modelle auf den Daten und Evaluierung ihrer Leistung anhand von Metriken wie R², MSE usw.
+Training und Evaluierung der Modelle auf Basis der Daten, z.B. mit Kreuzvalidierung und Metriken wie R² und MSE.
 
 # | Fazit und Ausblick
 ## Zusammenfassung
-Zusammenfassen der wichtigsten Erkenntnisse aus der Analyse und den Modellen.
+Zusammenfassung der wichtigsten Erkenntnisse aus der Analyse und Modellierung.
 
 ## Ausblick
-Diskussion über mögliche Erweiterungen, wie die Analyse weiterer Städte oder zusätzlicher Zeiträume.
+Diskussion möglicher Erweiterungen der Analyse und weiterer Schritte.

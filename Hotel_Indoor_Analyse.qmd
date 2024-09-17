@@ -53,6 +53,7 @@ Import der benötigten Python-Bibliotheken wie `pandas`, `numpy`, `matplotlib` u
 #| include: true
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import seaborn as sb
 import os
 ```

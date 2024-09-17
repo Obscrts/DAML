@@ -1,13 +1,15 @@
 ---
 # Headline
-title: "<img src='resources/images/logo/telekom.png' style='width: 100px; height: auto;'> Hotel Indoor Analyse <img src='resources/images/logo/fhdw.png' style='width: 100px; height: auto;'>"
+title: "<img src='resources/images/logo/telekom.png' style='width: 120px; height: auto;'> <span style='padding-left: 100px; padding-right: 100px;'>Hotel Indoor Analyse</span> <img src='resources/images/logo/fhdw.png' style='width: 120px; height: auto;'>"
 author: 
   name: "Cedric Klöpsch"
-  affiliations: "FHDW & Telekom"
+  affiliations: " Telekom & FHDW"
 date: today
 
 title-block-banner: "#FFFFFF"
 title-block-banner-color: "#E20075"
+
+theme: cosmo
 
 # description: ""
 
@@ -22,6 +24,8 @@ format:
     toc-expand: 2
     number-sections: true
     smooth-scroll: true
+    code-fold: true
+    code-summary: "Code anzeigen"
   pdf:
     toc: true
     toc-title: Inhaltsverzeichnis 
@@ -30,24 +34,70 @@ format:
     toc-expand: 2
     number-sections: true
     smooth-scroll: true
+    code-fold: true
+    code-summary: "Code anzeigen"
 jupyter: python3
 ---
 
+
+# | Datensatz
+Eine kurze Einführung in den Datensatz, einschließlich einer Übersicht über die verfügbaren Städte (z. B. Berlin, Köln) und der enthaltenen Mobilfunkdaten (Timing Advance, RSRP, RSRQ usw.).
+
+# | Erste Betrachtung der Daten
+## Imports
+Import der benötigten Python-Bibliotheken wie `pandas`, `numpy`, `matplotlib` und `seaborn`, die für die Datenverarbeitung und -visualisierung verwendet werden.
+
 ```{python}
 #| label: setup - importing libraries
-#| include: false
+#| include: true
 import pandas as pd
 import numpy as np
+import seaborn as sb
 import os
 ```
 
-# Einleitung
+## Einlesen des Datensatzes
+Laden der CSV-Dateien, Zusammenführen der Datensätze, falls nötig, und erste Übersicht über die Daten.
 
-## Aufgabenstellung
+## Erste Betrachtung des Datensatzes
+Anzeigen der ersten Zeilen des Datensatzes und der allgemeinen statistischen Informationen wie Mittelwert, Minimum und Maximum.
 
-## Datenquelle
-### Herkunft der Daten
+## Finden von NA’s
+Ermitteln von fehlenden Werten im Datensatz und Überlegung, wie mit diesen umgegangen werden soll (z.B. Imputation oder Entfernen).
 
-## Thesen
+## Beschreibung der Spalten
+Kurze Beschreibung der wichtigsten Spalten im Datensatz, z.B. was RSRP, RSRQ und Timing Advance darstellen.
 
-# Explorative Datenanalyse
+## Visualisierung der numerischen Daten
+Erste Visualisierungen wie Histogramme und Boxplots, um die Verteilung der numerischen Daten zu analysieren.
+
+# | Form und Verwendung der Daten
+## Datenaufbereitung
+Vorbereiten der Daten für die Analyse, einschließlich Behandlung fehlender Werte, Normalisierung und Aggregation der Daten.
+
+# | Explorative Datenanalyse (EDA)
+## Univariate Analyse
+Analyse einzelner Variablen wie RSRP und RSRQ, um deren Verteilung und mögliche Ausreißer zu verstehen.
+
+## Bivariate Analyse
+Untersuchung der Beziehungen zwischen zwei Variablen, z.B. Korrelation zwischen Timing Advance und RSRP, mithilfe von Scatterplots oder Heatmaps.
+
+## Multivariate Analyse
+Erweiterte Analyse der Daten durch Untersuchung der Wechselwirkungen zwischen mehreren Variablen, z.B. mithilfe von PCA oder anderen statistischen Methoden.
+
+# | Modellierung und Vorhersagen
+## Zielvariable festlegen
+Auswahl der Variablen, die vorhergesagt oder modelliert werden sollen, z.B. RSRP oder RSRQ.
+
+## Modellauswahl
+Auswahl geeigneter Machine-Learning-Modelle wie lineare Regression oder Entscheidungsbäume.
+
+## Modelltraining und Evaluierung
+Trainieren der Modelle auf den Daten und Evaluierung ihrer Leistung anhand von Metriken wie R², MSE usw.
+
+# | Fazit und Ausblick
+## Zusammenfassung
+Zusammenfassen der wichtigsten Erkenntnisse aus der Analyse und den Modellen.
+
+## Ausblick
+Diskussion über mögliche Erweiterungen, wie die Analyse weiterer Städte oder zusätzlicher Zeiträume.

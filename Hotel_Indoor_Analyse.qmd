@@ -39,7 +39,7 @@ format:
     code-fold: true
     code-summary: "Code anzeigen"
 execute:
-  echo: false
+  echo: true
   eval: true
   output: true
   warning: false

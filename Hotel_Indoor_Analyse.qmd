@@ -102,6 +102,7 @@ Der folgende Code-Block zeigt den Import der oben genannten Bibliotheken:
 ```{python}
 #| label: setup - importing libraries
 import pandas as pd
+import geopandas as gpd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns

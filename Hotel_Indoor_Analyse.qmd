@@ -97,10 +97,10 @@ Für die Analyse dieses Datensatzes werden verschiedene Python-Bibliotheken ben�
 - **seaborn**: Aufbauend auf matplotlib erleichtert seaborn das Erstellen ansprechender und informativer statistischer Visualisierungen und bietet weitergehende Funktionalitäten für die Visualisierung von Datenverteilungen und -beziehungen.
 
 - **os**: Diese Bibliothek dient zur Interaktion mit dem Betriebssystem, insbesondere zum Navigieren in Dateistrukturen und Arbeiten mit Dateipfaden, was bei der Verwaltung und dem Zugriff auf die CSV-Dateien hilfreich ist.
-
-Der folgende Code-Block zeigt den Import der oben genannten Bibliotheken:
 ```{python}
 #| label: setup - importing libraries
+#| include: false
+
 import pandas as pd
 import geopandas as gpd
 import numpy as np

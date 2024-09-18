@@ -2,6 +2,8 @@
 .quarto/
 /*_files
 
+/.jupyter_cache
+
 resources/data
 
 *.html

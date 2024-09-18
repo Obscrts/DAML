@@ -9,3 +9,4 @@ resources/data
 *.log
 
 *.quarto_ipynb
+.DS_Store

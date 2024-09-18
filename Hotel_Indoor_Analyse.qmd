@@ -22,8 +22,6 @@ format:
     toc: true
     toc-title: Inhaltsverzeichnis 
     toc-float: true
-    toc-depth: 2
-    toc-expand: 2
     number-sections: true
     smooth-scroll: true
     code-fold: true
@@ -32,12 +30,11 @@ format:
       - text: Github Repo
         icon: file-code
         href: https://github.com/Obscrts/DAML
+    embed-resources: true
   pdf:
     toc: true
     toc-title: Inhaltsverzeichnis 
     toc-float: true
-    toc-depth: 2
-    toc-expand: 2
     number-sections: true
     smooth-scroll: true
     code-fold: true

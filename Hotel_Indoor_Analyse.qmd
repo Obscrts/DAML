@@ -50,10 +50,10 @@ execute:
 jupyter: python3
 ---
 
-# | Überblick über den Datensatz
-Die Daten stammen aus dem Mobilfunknetz der Deutschen Telekom und wurden mit dem NitroGEO-Tool von Viavi extrahiert. Es handelt sich um Mobilfunkdaten, die als "Indoor" klassifiziert wurden, was darauf hinweist, dass die jeweiligen Endnutzergeräte zum Zeitpunkt der Erfassung mit hoher Wahrscheinlichkeit innerhalb eines Gebäudes waren. Der Datensatz umfasst mehrere große deutsche Städte, die Austragungsorte der Fußball-Europameisterschaft 2024 waren: Berlin, Köln, Dortmund, Düsseldorf, Frankfurt am Main, Gelsenkirchen, Hamburg, Leipzig, München und Stuttgart.
+# Überblick über den Datensatz
+Die Daten stammen aus dem Mobilfunknetz der Deutschen Telekom und wurden mit dem NitroGEO-Tool von Viavi extrahiert. Es handelt sich um Mobilfunkdaten, die als "Indoor" klassifiziert wurden, was bedeutet, dass die jeweiligen Endnutzergeräte zum Zeitpunkt der Erfassung mit hoher Wahrscheinlichkeit innerhalb eines Gebäudes waren. Der Datensatz umfasst mehrere große deutsche Städte, die Austragungsorte der Fußball-Europameisterschaft 2024 waren: Berlin, Köln, Dortmund, Düsseldorf, Frankfurt am Main, Gelsenkirchen, Hamburg, Leipzig, München und Stuttgart.
 
-Zusätzlich zu den Hauptdatensätzen, die die tatsächlichen Hotelbereiche abdecken, gibt es einen zweiten Datensatz, der sogenannte **buffered polygons** enthält. Diese Polygone sind größer als die tatsächlichen Hotelbereiche und wurden erstellt, um die Umgebung um die Hotels zu analysieren. Beide Datensätze enthalten dieselben Mobilfunkmetriken, jedoch mit unterschiedlichen räumlichen Ausdehnungen.
+Zusätzlich zu den Hauptdatensätzen, die die tatsächlichen Hotelbereiche abdecken, gibt es einen zweiten Datensatz, der sogenannte **Buffered Polygons**(gepufferte Polygone) enthält. Diese Polygone sind größer als die tatsächlichen Hotelbereiche und wurden erstellt, um die Umgebung um die Hotels zu analysieren. Beide Datensätze enthalten dieselben Mobilfunkmetriken, jedoch mit unterschiedlichen räumlichen Ausdehnungen.
 
 Die enthaltenen Messwerte umfassen wichtige Metriken wie Timing Advance (TA), RSRP (Reference Signal Received Power) und RSRQ (Reference Signal Received Quality), die Informationen über die Signalqualität und die Reichweite innerhalb und außerhalb von Gebäuden liefern. Ein dritter Datensatz in Form einer **GeoJSON-Datei** gibt Aufschluss über die geografische Lage und Größe der Polygone, um eine räumliche Analyse durchzuführen.
 
@@ -109,52 +109,91 @@ import seaborn as sns
 ```
 
 ## Einlesen des Datensatzes
-In diesem Abschnitt werden die normalen Hotel-Daten und die der gepufferten Polygone für die verschiedenen Städte eingelesen und zusammengeführt. Die normalen Daten repräsentieren die tatsächlichen Hotelbereiche, während die gepufferten Polygone größere Bereiche um die Hotels herum abdecken, um auch die Umgebung zu analysieren.
+In diesem Abschnitt werden die normalen Hotel-Daten und die gepufferten Polygone für die verschiedenen Städte eingelesen und zusammengeführt. Die normalen Daten repräsentieren die tatsächlichen Hotelbereiche, während die gepufferten Polygone größere Bereiche um die Hotels herum abdecken, um auch die Umgebung zu analysieren.
 
 Jeder Datensatz wird mit einer zusätzlichen Spalte versehen, die kennzeichnet, ob es sich um normale oder gepufferte Daten handelt. Zudem wird der Name der jeweiligen Stadt in den Datensatz aufgenommen, um die Analyse später nach Städten segmentieren zu können.
 
 ### Vorgehen:
+**Einlesen und Zusammenführen der Daten für jede Stadt**<br/>
+Zuerst werden die normalen Daten, die die tatsächlichen Hotelbereiche abdecken, eingelesen. 
 ```{python}
-#| label: load and combine data
+#| label: loading normal dataset
 
 # Liste der Stadtkürzel
 cities = ['BER', 'CGN', 'DOR', 'DUS', 'FFM', 'GEL', 'HH', 'LPZ', 'MUC', 'STG']
 
-# Leere Listen, um die kombinierten Daten zu speichern
-combined_data = []
+# Leere Liste für normale Daten
+normal_data = []
 
-# Einlesen und Zusammenführen der normalen und buffered CSV-Daten für jede Stadt
+# Einlesen der normalen CSV-Daten für jede Stadt
 for city in cities:
-    # Einlesen der normalen CSV-Daten
     normal_path = f'resources/data/normal/geo_export_{city}.csv'
-    buffered_path = f'resources/data/buffered/polygon_kpi_{city}.csv'
-    
     normal_df = pd.read_csv(normal_path)
+    
+    # Hinzufügen eines Identifikators, um die Daten als normal zu kennzeichnen
+    normal_df['type'] = 'normal'
+    
+    # Hinzufügen der Stadt als Spalte
+    normal_df['city'] = city
+    
+    # Speichern der normalen Daten
+    normal_data.append(normal_df)
+
+# Zusammenführen aller normalen Daten
+normal_combined_df = pd.concat(normal_data, ignore_index=True)
+```
+<br/>
+**Einlesen der gepufferten Daten**<br/>
+Nun werden die gepufferten Polygone eingelesen, die größere Bereiche um die Hotels abdecken.
+```{python}
+#| label: loading buffered dataset
+
+# Leere Liste für gepufferte Daten
+buffered_data = []
+
+# Einlesen der gepufferten CSV-Daten für jede Stadt
+for city in cities:
+    buffered_path = f'resources/data/buffered/polygon_kpi_{city}.csv'
     buffered_df = pd.read_csv(buffered_path)
     
-    # Hinzufügen eines Identifikators, um zwischen normal und buffered zu unterscheiden
-    normal_df['type'] = 'normal'
+    # Hinzufügen eines Identifikators, um die Daten als gepuffert zu kennzeichnen
     buffered_df['type'] = 'buffered'
     
-    # Hinzufügen eines Stadtnamens
-    normal_df['city'] = city
+    # Hinzufügen der Stadt als Spalte
     buffered_df['city'] = city
     
-    # Kombinieren der beiden Datensätze
-    combined_city_df = pd.concat([normal_df, buffered_df], ignore_index=True)
-    
-    # Hinzufügen der kombinierten Daten zur Liste
-    combined_data.append(combined_city_df)
+    # Speichern der gepufferten Daten
+    buffered_data.append(buffered_df)
 
-# Zusammenführen aller Städte in einen finalen DataFrame
-final_combined_df = pd.concat(combined_data, ignore_index=True)
+# Zusammenführen aller gepufferten Daten
+buffered_combined_df = pd.concat(buffered_data, ignore_index=True)
 ```
+<br/>
+**Zusammenführen der normalen und gepufferten Daten**<br/>
+Nachdem die normalen und gepufferten Daten separat eingelesen wurden, werden sie nun zu einem finalen DataFrame kombiniert.
+```{python}
+#| label: combining both dataset
 
-  1. **Einlesen der normalen Hotel-Daten**: Die normalen Daten enthalten die tatsächlichen Messungen innerhalb der Hotelpolygone.
+# Kombinieren der normalen und gepufferten Daten
+combined_df = pd.concat([normal_combined_df, buffered_combined_df], ignore_index=True)
+```
+<br/>
 
-  2. **Einlesen der gepufferten Polygon Daten**: Diese Daten repräsentieren größere Bereiche um die Hotels herum und enthalten dieselben Mobilfunkmessungen, jedoch für einen erweiterten Raum.
+## Berechnung der Polygonflächen
 
-  3. **Zusammenführen der Daten**: Für jede Stadt werden die normalen und buffered Daten kombiniert. Dabei wird eine Spalte hinzugefügt, die den Typ (normal oder buffered) und die Stadt angibt.
+In diesem Abschnitt werden die Flächen der Polygone berechnet, die die geografischen Bereiche der Hotels und deren Umgebung beschreiben. Diese Polygone wurden in **GeoJSON**-Dateien gespeichert, die jede Stadt und deren Hotelbereiche repräsentieren.
+
+Um die Flächen der Polygone zu berechnen, werden die GeoJSON-Dateien für jede Stadt eingelesen und die geometrischen Informationen extrahiert. Dabei konvertieren wir die Geometrien in ein metrisches Koordinatensystem (z.B. **UTM Zone 33N**), um die Flächen in Quadratmetern zu berechnen. Zusätzlich erstellen wir eine eindeutige **Name**-Spalte, die aus der **Cluster-ID** und der **Polygon-ID** besteht, um die Polygone später mit den entsprechenden Hotel-Daten zu verknüpfen.
+
+### Vorgehen:
+
+1. **Einlesen der GeoJSON-Dateien**: Alle GeoJSON-Dateien, die die Polygone der Hotels repräsentieren, werden eingelesen.
+
+2. **Koordinatensystem-Umwandlung**: Um die Flächen korrekt zu berechnen, werden die Geometrien in ein metrisches Koordinatensystem konvertiert.
+
+3. **Berechnung der Flächen**: Für jedes Polygon wird die Fläche in Quadratmetern berechnet.
+
+4. **Erstellen der **Name**-Spalte**: Der Name wird basierend auf der Cluster-ID und der Polygon-ID generiert, um die Daten später mit den Hotels zu verknüpfen.
 
 ```{python}
 #| label: calculate polygon area sizes
@@ -207,21 +246,58 @@ for cluster_file in cluster_files:
 polygon_areas_df = pd.concat(polygon_areas, ignore_index=True)
 
 # Anzeigen der ersten Zeilen der berechneten Flächen mit den generierten Namen
-print(polygon_areas_df.head(10))
+display(polygon_areas_df.head(10))
 ```
-## Erste Betrachtung des Datensatzes
-Anzeigen der ersten Zeilen der Daten, um die Struktur zu verstehen.
 
-## Finden von NA’s
-Ermitteln von fehlenden Werten in den Datensätzen.
+Abschließend wird der kombinierte Datensatz der Hoteldaten mit den berechneten Polygongrößen erweitert, um so einen einzign Datensatz mit allen Informationen zu erhalten.
+```{python}
+#| label: combine hotel dataset with polygon area
 
-## Umgang mit fehlenden Werten
-Behandlung der fehlenden Werte (z.B. durch Imputation oder Entfernung).
+# Extrahieren des Cluster-ID#Polygon-ID-Teils (z.B. "10#01" aus "10#01 Hotel Berlin, Berlin")
+combined_df['extracted_name'] = combined_df['Name'].str.extract(r'(\d{2}#\d{2})')
+
+# Nun führen wir den Merge durch, indem wir die extrahierten Namen und die Polygon 'name'-Spalte verwenden
+final_combined_df = pd.merge(combined_df, polygon_areas_df, left_on='extracted_name', right_on='name', how='left')
+
+# Entfernen der Spalten "name" und "extracted_name" aus dem finalen DataFrame
+final_combined_df.drop(['name', 'extracted_name'], axis=1, inplace=True)
+```
 
 ## Beschreibung der Spalten
 Detaillierte Beschreibung der wichtigsten Spalten, z.B. RSRP, RSRQ, TA, sowie zusätzliche Metriken aus den buffered Polygons und GeoJSON-Daten.
 
-# | Vergleich der Datensätze
+## Erste Betrachtung des Datensatzes
+Bevor wir in die detaillierte Analyse einsteigen, werfen wir einen ersten Blick auf die Struktur des kombinierten Datensatzes. Dies hilft uns, die enthaltenen Spalten, die Datentypen und die ersten Werte zu verstehen. Der Datensatz enthält Informationen sowohl aus den normalen Hotel-Daten als auch den buffered polygons, wobei jeder Eintrag mit einem Typ (normal oder buffered) und einer Stadt versehen ist.
+
+Im nächsten Schritt zeigen wir die ersten Zeilen des Datensatzes an, um sicherzustellen, dass alle Daten korrekt geladen und kombiniert wurden.
+
+```{python}
+#| label: first look on combined df
+
+display(final_combined_df.head())
+```
+
+```{python}
+#| label: first look on polygon area
+
+# Histogramm der Polygonflächen
+plt.figure(figsize=(10, 6))
+sns.histplot(polygon_areas_df['area_m2'], bins=30, kde=True)
+plt.title('Verteilung der Polygonflächen')
+plt.xlabel('Fläche (m²)')
+plt.ylabel('Anzahl')
+plt.grid(True)
+plt.show()
+
+# Boxplot der Polygonflächen
+plt.figure(figsize=(10, 6))
+sns.boxplot(x=polygon_areas_df['area_m2'])
+plt.title('Boxplot der Polygonflächen')
+plt.xlabel('Fläche (m²)')
+plt.grid(True)
+```
+
+# Vergleich der Datensätze
 ## Vergleich der Hotel- und buffered Polygons-Daten
 Untersuchung der Unterschiede zwischen den Daten aus den echten Hotelpolygone und den buffered Polygons.
 
@@ -231,17 +307,129 @@ Untersuchung der Korrelation zwischen Timing Advance (TA) und den Signalqualitä
 ## Statistischer Vergleich
 Vergleich der Mittelwerte, Mediane und Standardabweichungen der relevanten Metriken in den beiden Datensätzen.
 
-# | Explorative Datenanalyse (EDA)
+# Explorative Datenanalyse (EDA)
 ## Univariate Analyse
-Untersuchung der Verteilung einzelner Variablen in den Datensätzen, z.B. Histogramme und Boxplots für TA, RSRP und RSRQ.
+In diesem Abschnitt untersuchen wir die Verteilung einzelner Variablen (z.B. TA, RSRP, RSRQ) im Datensatz. Dies gibt uns Einblicke in die Verteilung der Daten und zeigt mögliche Ausreißer oder Anomalien.
 
-## Bivariate Analyse
-Untersuchung der Zusammenhänge zwischen zwei Variablen, z.B. Scatterplots zur Analyse der Korrelation zwischen TA und RSRP/RSRQ.
+### Verteilung der Variablen TA, RSRP und RSRQ
+```{python}
+#| label: univariate analysis
 
-## Multivariate Analyse
-Untersuchung von Wechselwirkungen zwischen mehreren Variablen und Einsatz fortgeschrittener statistischer Methoden wie PCA (Principal Component Analysis) oder Regressionsmodelle.
+# Zuerst prüfen, ob die Spalten bereits numerisch sind
+if combined_df['RSRP Avg (dBm)'].dtype == 'object':
+    combined_df['RSRP Avg (dBm)'] = combined_df['RSRP Avg (dBm)'].str.replace(',', '').astype(float)
+else:
+    combined_df['RSRP Avg (dBm)'] = combined_df['RSRP Avg (dBm)'].astype(float)
 
-# | Modellierung und Vorhersagen
+if combined_df['TA Avg (m)'].dtype == 'object':
+    combined_df['TA Avg (m)'] = combined_df['TA Avg (m)'].str.replace(',', '').astype(float)
+else:
+    combined_df['TA Avg (m)'] = combined_df['TA Avg (m)'].astype(float)
+
+# Erstellen eines Histogramms für TA
+plt.figure(figsize=(10, 6))
+sns.histplot(combined_df['TA Avg (m)'], bins=30, kde=True)
+plt.title('Verteilung von Timing Advance (TA)')
+plt.xlabel('TA (m)')
+plt.ylabel('Anzahl')
+plt.grid(True)
+plt.show()
+
+# Boxplot für RSRP und RSRQ
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=combined_df[['RSRP Avg (dBm)', 'RSRQ Avg (dB)']])
+plt.title('Boxplot von RSRP und RSRQ')
+plt.grid(True)
+plt.show()
+```
+
+## Datenbereinigung
+### Entfernen von Ausreißern
+In diesem Abschnitt bereinigen wir die Polygonflächen-Daten, indem wir Ausreißer identifizieren und entfernen. Ausreißer sind extreme Werte, die weit außerhalb des normalen Bereichs der Daten liegen und die Analyse verzerren könnten.
+
+#### Vorgehensweise:
+Um Ausreißer zu identifizieren, verwenden wir die **Interquartilsabstand (IQR)**-Methode. Der IQR ist der Abstand zwischen dem 1. Quartil (Q1, 25%-Perzentil) und dem 3. Quartil (Q3, 75%-Perzentil). Dieser Bereich umfasst die mittleren 50% der Daten.
+
+1. **Berechnung von Q1 und Q3**: Wir berechnen das 1. und 3. Quartil der Flächenverteilung.
+
+2. **Berechnung des Interquartilsabstands (IQR)**: Der IQR wird als Differenz zwischen Q3 und Q1 berechnet.
+
+3. **Definition der Grenzen für Ausreißer**: Werte, die mehr als das 1,5-fache des IQR unterhalb von Q1 oder oberhalb von Q3 liegen, werden als Ausreißer betrachtet.
+
+4. **Entfernen von Ausreißern**: Alle Flächenwerte, die außerhalb der definierten Grenzen liegen, werden entfernt.
+```{python}
+#| label: removal of outsiders
+
+# Berechnung des 1. Quartils (Q1) und des 3. Quartils (Q3)
+Q1 = polygon_areas_df['area_m2'].quantile(0.25)
+Q3 = polygon_areas_df['area_m2'].quantile(0.75)
+IQR = Q3 - Q1
+
+# Definition der Schwellenwerte für die Fläche
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+# Entfernen von Ausreißern (Polygone außerhalb der definierten Grenzen)
+polygon_areas_filtered_df = polygon_areas_df[(polygon_areas_df['area_m2'] >= lower_bound) & (polygon_areas_df['area_m2'] <= upper_bound)]
+
+# Anzeigen der bereinigten Daten
+print(f"Vor dem Entfernen der Ausreißer: {len(polygon_areas_df)} Polygone")
+print(f"Nach dem Entfernen der Ausreißer: {len(polygon_areas_filtered_df)} Polygone")
+
+# Histogramm der bereinigten Polygonflächen
+plt.figure(figsize=(10, 6))
+sns.histplot(polygon_areas_filtered_df['area_m2'], bins=30, kde=True)
+plt.title('Verteilung der bereinigten Polygonflächen')
+plt.xlabel('Fläche (m²)')
+plt.ylabel('Anzahl')
+plt.grid(True)
+plt.show()
+
+# Boxplot der bereinigten Polygonflächen
+plt.figure(figsize=(10, 6))
+sns.boxplot(x=polygon_areas_filtered_df['area_m2'])
+plt.title('Boxplot der bereinigten Polygonflächen')
+plt.xlabel('Fläche (m²)')
+plt.grid(True)
+plt.show()
+```
+
+### Finden von NA’s
+In diesem Abschnitt untersuchen wir, ob es fehlende Werte (NA’s) in den Daten gibt. Fehlende Werte können die Analyse verfälschen und müssen behandelt werden.
+
+#### Vorgehensweise:
+Wir verwenden die Methode `.isnull()` in Kombination mit `.sum()`, um zu überprüfen, wie viele fehlende Werte in jeder Spalte vorhanden sind.
+```{python}
+#| label: find NAs
+
+# Überprüfen, wie viele fehlende Werte es in jeder Spalte gibt
+na_counts = final_combined_df.isnull().sum()
+print(na_counts)
+```
+
+### Umgang mit fehlenden Werten
+Nachdem wir die fehlenden Werte identifiziert haben, überlegen wir, wie wir mit diesen Werten umgehen. Mögliche Strategien sind:
+
+- **Entfernen**: Entfernen von Zeilen oder Spalten mit vielen fehlenden Werten.
+
+- **Imputation**: Ersetzen fehlender Werte durch statistische Kennzahlen (z.B. Mittelwert oder Median).
+
+In diesem Fall entscheiden wir uns für die Imputation der fehlenden Werte mithilfe des Medians.
+```{python}
+#| label: handle NAs
+
+# Nur numerische Spalten auswählen
+numeric_columns = final_combined_df.select_dtypes(include=[np.number]).columns
+
+# Ersetzen der fehlenden Werte in numerischen Spalten mit dem Median
+final_combined_df[numeric_columns] = final_combined_df[numeric_columns].fillna(final_combined_df[numeric_columns].median())
+
+# Überprüfen, ob noch fehlende Werte vorhanden sind
+na_counts_after = final_combined_df.isnull().sum()
+print(na_counts_after)
+```
+
+# Modellierung und Vorhersagen
 ## Zielvariable festlegen
 Bestimmung der zu modellierenden Zielvariable, z.B. RSRP oder RSRQ.
 
@@ -251,7 +439,7 @@ Auswahl geeigneter Machine-Learning-Modelle wie lineare Regression, Entscheidung
 ## Modelltraining und Evaluierung
 Training und Evaluierung der Modelle auf Basis der Daten, z.B. mit Kreuzvalidierung und Metriken wie R² und MSE.
 
-# | Fazit und Ausblick
+# Fazit und Ausblick
 ## Zusammenfassung
 Zusammenfassung der wichtigsten Erkenntnisse aus der Analyse und Modellierung.
 

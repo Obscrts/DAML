@@ -62,7 +62,6 @@ Die enthaltenen Messwerte umfassen wichtige Metriken wie Timing Advance (TA), RS
 
 Eine detaillierte Erklärung der Metriken und deren Bedeutung erfolgt im weiteren Verlauf der Analyse.
 
-
 ## Thesen
 
 1. **Hotels mit höherem Timing Advance (TA) haben im Durchschnitt eine schlechtere Signalqualität (RSRP, RSRQ)**
@@ -73,9 +72,9 @@ Eine detaillierte Erklärung der Metriken und deren Bedeutung erfolgt im weitere
 
 2. **Hotels in dichter besiedelten Gebieten haben im Durchschnitt eine schlechtere Netzqualität als Hotels in weniger dicht besiedelten Gebieten**
 
-  - **Begründung**: Städtische Gebiete haben tendenziell mehr Netzwerkauslastung, was zu schlechteren Signalstärken und höheren Verbindungsfehlern führen könnte.
-
-  - **Mögliche Analyse**: Durch den Einsatz von geospatialen Daten und den Polygonflächen könnte untersucht werden, ob Hotels in urbanen Gebieten signifikant schlechtere Netzqualitäten aufweisen. Eine Clusteranalyse könnte basierend auf der geografischen Lage und den Signalqualitäten durchgeführt werden.
+   - **Begründung**: Städtische Gebiete haben tendenziell mehr Netzwerkauslastung, was zu schlechteren Signalstärken und höheren Verbindungsfehlern führen könnte.
+   
+   - **Mögliche Analyse**: Durch den Einsatz von geospatialen Daten und den Polygonflächen könnte untersucht werden, ob Hotels in urbanen Gebieten signifikant schlechtere Netzqualitäten aufweisen. Eine Clusteranalyse könnte basierend auf der geografischen Lage und den Signalqualitäten durchgeführt werden.
 
 3. **Hotels mit hoher Datenübertragungsrate (DL/UL Throughput) zeigen eine bessere Signalqualität (RSRP, RSRQ) als Hotels mit niedriger Datenübertragungsrate**
 

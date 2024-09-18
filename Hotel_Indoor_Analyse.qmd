@@ -109,7 +109,52 @@ import seaborn as sns
 ```
 
 ## Einlesen des Datensatzes
-Schrittweise Erklärung des Einlesens der Hotel-, buffered Polygons- und GeoJSON-Daten.
+In diesem Abschnitt werden die normalen Hotel-Daten und die der gepufferten Polygone für die verschiedenen Städte eingelesen und zusammengeführt. Die normalen Daten repräsentieren die tatsächlichen Hotelbereiche, während die gepufferten Polygone größere Bereiche um die Hotels herum abdecken, um auch die Umgebung zu analysieren.
+
+Jeder Datensatz wird mit einer zusätzlichen Spalte versehen, die kennzeichnet, ob es sich um normale oder gepufferte Daten handelt. Zudem wird der Name der jeweiligen Stadt in den Datensatz aufgenommen, um die Analyse später nach Städten segmentieren zu können.
+
+### Vorgehen:
+```{python}
+#| label: load and combine data
+
+# Liste der Stadtkürzel
+cities = ['BER', 'CGN', 'DOR', 'DUS', 'FFM', 'GEL', 'HH', 'LPZ', 'MUC', 'STG']
+
+# Leere Listen, um die kombinierten Daten zu speichern
+combined_data = []
+
+# Einlesen und Zusammenführen der normalen und buffered CSV-Daten für jede Stadt
+for city in cities:
+    # Einlesen der normalen CSV-Daten
+    normal_path = f'resources/data/normal/geo_export_{city}.csv'
+    buffered_path = f'resources/data/buffered/polygon_kpi_{city}.csv'
+    
+    normal_df = pd.read_csv(normal_path)
+    buffered_df = pd.read_csv(buffered_path)
+    
+    # Hinzufügen eines Identifikators, um zwischen normal und buffered zu unterscheiden
+    normal_df['type'] = 'normal'
+    buffered_df['type'] = 'buffered'
+    
+    # Hinzufügen eines Stadtnamens
+    normal_df['city'] = city
+    buffered_df['city'] = city
+    
+    # Kombinieren der beiden Datensätze
+    combined_city_df = pd.concat([normal_df, buffered_df], ignore_index=True)
+    
+    # Hinzufügen der kombinierten Daten zur Liste
+    combined_data.append(combined_city_df)
+
+# Zusammenführen aller Städte in einen finalen DataFrame
+final_combined_df = pd.concat(combined_data, ignore_index=True)
+```
+
+  1. **Einlesen der normalen Hotel-Daten**: Die normalen Daten enthalten die tatsächlichen Messungen innerhalb der Hotelpolygone.
+
+  2. **Einlesen der gepufferten Polygon Daten**: Diese Daten repräsentieren größere Bereiche um die Hotels herum und enthalten dieselben Mobilfunkmessungen, jedoch für einen erweiterten Raum.
+
+  3. **Zusammenführen der Daten**: Für jede Stadt werden die normalen und buffered Daten kombiniert. Dabei wird eine Spalte hinzugefügt, die den Typ (normal oder buffered) und die Stadt angibt.
 
 ## Erste Betrachtung des Datensatzes
 Anzeigen der ersten Zeilen der Daten, um die Struktur zu verstehen.

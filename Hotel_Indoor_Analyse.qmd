@@ -49,6 +49,7 @@ execute:
   warning: false
   error: false
   embed: false
+  cache: true
 jupyter: python3
 ---
 

@@ -447,7 +447,7 @@ In diesem Abschnitt untersuchen wir die Verteilung einzelner Variablen (z.B. TA,
 
 ### Verteilung der Variable TA
 ```{python}
-#| label: univariate analysis - ta
+#| label: univariate analysis - ta histogram
 
 # Zuerst prüfen, ob die Spalten bereits numerisch sind
 if combined_df['RSRP Avg (dBm)'].dtype == 'object':
@@ -468,6 +468,12 @@ plt.xlabel('TA (m)')
 plt.ylabel('Anzahl')
 plt.grid(True)
 plt.show()
+```
+
+Die Verteilung der Variable **Timing Advance (TA)** zeigt eine stark rechtssteile Verteilung, bei der die meisten Werte im Bereich von 0 bis 500 Metern liegen. Dies bedeutet, dass sich die Mehrheit der Mobilfunkgeräte relativ nahe an den Basisstationen befindet, was zu geringeren TA-Werten führt. Gleichzeitig sind einige extreme Werte sichtbar, die über 2000 Meter hinausgehen. Diese hohen TA-Werte repräsentieren Mobilfunkgeräte, die weiter entfernt von der Basisstation sind.
+
+```{python}
+#| label: univariate analysis - ta boxplot
 
 # Boxplot für TA (Timing Advance)
 plt.figure(figsize=(10, 6))
@@ -477,6 +483,8 @@ plt.xlabel('TA (m)')
 plt.grid(True)
 plt.show()
 ```
+
+Im **Boxplot** ist deutlich erkennbar, dass es eine Vielzahl von Ausreißern gibt, die sich über den Bereich von 2000 bis 8000 Metern erstrecken. Diese Ausreißer deuten auf eine ungleichmäßige Verteilung der Distanzen zwischen den Mobilfunkgeräten und den Basisstationen hin. In einem der nächsten Schritte wird eine Bereinigung der Ausreißer notwendig sein, um die Analyse der TA-Werte zu präzisieren.
 
 ### Verteilung der Variablen RSRP und RSRQ
 ```{python}

@@ -94,6 +94,7 @@ Eine detaillierte Erklärung der Metriken und deren Bedeutung erfolgt im weitere
 Für die Analyse dieses Datensatzes werden verschiedene Python-Bibliotheken benötigt, die essenzielle Funktionen zur Datenverarbeitung und -visualisierung bereitstellen. Zu den wichtigsten Bibliotheken zählen:
 
 - **pandas**: Eine leistungsstarke Bibliothek zur Datenmanipulation und -analyse. Sie wird verwendet, um Daten aus CSV-Dateien zu laden und in einem DataFrame-Format darzustellen, das eine effiziente Analyse ermöglicht.
+
 - **geopandas**: Eine Erweiterung von Pandas, die speziell für die Arbeit mit räumlichen Daten entwickelt wurde. Sie ermöglicht es, geografische Daten aus verschiedenen Formaten wie GeoJSON oder Shapefiles zu laden und in einem GeoDataFrame zu speichern, das die Funktionalität von Pandas mit der Möglichkeit zur Analyse von Geometrien wie Punkten, Linien und Polygonen kombiniert.
 
 - **numpy**: Diese Bibliothek bietet mathematische Funktionen für numerische Operationen und unterstützt insbesondere bei der Verarbeitung großer Datenmengen und Arrays.
@@ -189,7 +190,7 @@ combined_df = pd.concat([normal_combined_df, buffered_combined_df], ignore_index
 
 In diesem Abschnitt werden die Flächen der Polygone berechnet, die die geografischen Bereiche der Hotels und deren Umgebung beschreiben. Diese Polygone wurden in **GeoJSON**-Dateien gespeichert, die jede Stadt und deren Hotelbereiche repräsentieren.
 
-Um die Flächen der Polygone zu berechnen, werden die GeoJSON-Dateien für jede Stadt eingelesen und die geometrischen Informationen extrahiert. Dabei konvertieren wir die Geometrien in ein metrisches Koordinatensystem (z.B. **UTM Zone 33N**), um die Flächen in Quadratmetern zu berechnen. Zusätzlich erstellen wir eine eindeutige **Name**-Spalte, die aus der **Cluster-ID** und der **Polygon-ID** besteht, um die Polygone später mit den entsprechenden Hotel-Daten zu verknüpfen.
+Um die Flächen der Polygone zu berechnen, werden die GeoJSON-Dateien für jede Stadt eingelesen und die geometrischen Informationen extrahiert. Dabei konvertieren wir die Geometrien in ein metrisches Koordinatensystem (z.B. **UTM Zone 33N**), um die Flächen in Quadratmetern zu berechnen. Zusätzlich wird eine eindeutige **Name**-Spalte erstellt, die aus der **Cluster-ID** und der **Polygon-ID** besteht, um die Polygone später mit den entsprechenden Hotel-Daten zu verknüpfen.
 
 ### Vorgehen:
 

@@ -345,34 +345,101 @@ In diesem Abschnitt vergleichen wir die **Hotel-Daten** mit denen der **Buffered
 
 - **Statistischer Vergleich**: Für jede Gruppe berechnen wir Mittelwert, Median und Standardabweichung relevanter Metriken, wie TA, RSRP und RSRQ. Dies gibt uns Aufschluss darüber, wie sich die Netzqualität zwischen den tatsächlichen Hotelbereichen und den gepufferten Zonen unterscheidet.
 ```{python}
-#| label: first look on polygon area
+#| label: compare datasets
 
-# Histogramm der Polygonflächen
-plt.figure(figsize=(10, 6))
-sns.histplot(polygon_areas_df['area_m2'], bins=30, kde=True)
-plt.title('Verteilung der Polygonflächen')
-plt.xlabel('Fläche (m²)')
-plt.ylabel('Anzahl')
-plt.grid(True)
-plt.show()
+# Überprüfen der Datentypen
+print(final_combined_df.dtypes)
 
-# Boxplot der Polygonflächen
-plt.figure(figsize=(10, 6))
-sns.boxplot(x=polygon_areas_df['area_m2'])
-plt.title('Boxplot der Polygonflächen')
-plt.xlabel('Fläche (m²)')
-plt.grid(True)
+# Sicherstellen, dass relevante Metriken numerisch sind
+final_combined_df['TA Avg (m)'] = pd.to_numeric(final_combined_df['TA Avg (m)'], errors='coerce')
+final_combined_df['RSRP Avg (dBm)'] = pd.to_numeric(final_combined_df['RSRP Avg (dBm)'], errors='coerce')
+final_combined_df['RSRQ Avg (dB)'] = pd.to_numeric(final_combined_df['RSRQ Avg (dB)'], errors='coerce')
+final_combined_df['area_m2'] = pd.to_numeric(final_combined_df['area_m2'], errors='coerce')
+
+# Segmentierung in 'normal' und 'buffered' Datensätze
+normal_df = final_combined_df[final_combined_df['type'] == 'normal']
+buffered_df = final_combined_df[final_combined_df['type'] == 'buffered']
+
+# Liste relevanter Metriken zur Analyse
+metrics = ['TA Avg (m)', 'RSRP Avg (dBm)', 'RSRQ Avg (dB)', 'area_m2']
+
+# Berechnung von Mittelwert, Median und Standardabweichung für jede Metrik in den beiden Gruppen
+normal_stats = normal_df[metrics].agg(['mean', 'median', 'std'])
+buffered_stats = buffered_df[metrics].agg(['mean', 'median', 'std'])
+
+# Anzeigen der statistischen Werte für beide Gruppen
+print("Statistiken für die Hotel-Daten:")
+display(normal_stats)
+
+print("\nStatistiken für die Buffered Polygon-Daten:")
+display(buffered_stats)
 ```
 
-# Vergleich der Datensätze
-## Vergleich der Hotel- und buffered Polygons-Daten
-Untersuchung der Unterschiede zwischen den Daten aus den echten Hotelpolygone und den buffered Polygons.
+## Interpretation der Ergebnisse
+Die Ergebnisse zeigen einen Vergleich der wichtigsten Metriken zwischen den tatsächlichen Hotelbereichen (normal) und den gepufferten Bereichen (buffered polygons). Wir betrachten die Mittelwerte, Mediane und Standardabweichungen für die Metriken **Timing Advance (TA)**, **RSRP**, **RSRQ** und die **Polygonfläche (area_m2)**.
 
-## Korrelation zwischen TA und RSRP/RSRQ
-Untersuchung der Korrelation zwischen Timing Advance (TA) und den Signalqualitätsmetriken (RSRP/RSRQ) in beiden Datensätzen.
+### Timing Advance (TA)
+- **Normal (Hotel-Daten)**:
+    - Mittelwert: 467.34 m
+    - Median: 301.76 m
+    - Standardabweichung: 1115.79 m
 
-## Statistischer Vergleich
-Vergleich der Mittelwerte, Mediane und Standardabweichungen der relevanten Metriken in den beiden Datensätzen.
+- **Buffered Polygon-Daten**:
+    - Mittelwert: 312.11 m
+    - Median: 267.56 m
+    - Standardabweichung: 205.84 m
+
+**Interpretation**: Der Mittelwert und der Median für das **Timing Advance** in den gepufferten Polygonen ist niedriger als in den normalen Hotelbereichen. Dies deutet darauf hin, dass die gepufferten Bereiche tendenziell näher an den Mobilfunkmasten liegen als die tatsächlichen Hotelbereiche. Die höhere Standardabweichung bei den normalen Daten zeigt, dass es in den Hotelbereichen eine größere Variation in der Entfernung zu den Basisstationen gibt.
+
+### RSRP (Reference Signal Received Power)
+- **Normal (Hotel-Daten)**:
+    - Mittelwert: -94.89 dBm
+    - Median: -94.81 dBm
+    - Standardabweichung: 10.21 dBm
+
+- **Buffered Polygon-Daten**:
+    - Mittelwert: -93.49 dBm
+    - Median: -93.37 dBm
+    - Standardabweichung: 9.40 dBm
+
+**Interpretation**: Die **RSRP**-Werte (Signalstärke) in den gepufferten Bereichen sind im Mittelwert und Median etwas besser (höher) als in den normalen Hotelbereichen. Dies könnte darauf hindeuten, dass die Umgebung um die Hotels herum eine bessere Signalstärke aufweist als die Hotels selbst. Auch die geringere Standardabweichung bei den gepufferten Daten deutet auf eine etwas konsistentere Signalstärke hin.
+
+### RSRQ (Reference Signal Received Quality)
+- **Normal (Hotel-Daten)**:
+    - Mittelwert: -9.99 dB
+    - Median: -9.88 dB
+    - Standardabweichung: 1.80 dB
+
+- **Buffered Polygon-Daten**:
+    - Mittelwert: -9.94 dB
+    - Median: -9.87 dB
+    - Standardabweichung: 1.60 dB
+
+**Interpretation**: Die **RSRQ**-Werte (Signalqualität) zeigen kaum Unterschiede zwischen den normalen Hotelbereichen und den gepufferten Polygonen. Die Werte sind in beiden Datensätzen ähnlich, was darauf hindeutet, dass die Signalqualität innerhalb und um die Hotels herum vergleichbar ist.
+
+### Polygonfläche (area_m2)
+- **Normal (Hotel-Daten)**:
+    - Mittelwert: 1258.35 m²
+    - Median: 712.68 m²
+    - Standardabweichung: 2927.15 m²
+
+- **Buffered Polygon-Daten**:
+    - Mittelwert: 1054.01 m²
+    - Median: 502.56 m²
+    - Standardabweichung: 1690.31 m²
+
+**Interpretation**: Die **Fläche der Polygone** ist bei den normalen Hotel-Daten im Mittel größer als bei den gepufferten Daten, was überraschend erscheinen mag. Ein Grund hierfür könnte sein, dass einige sehr große Hotelpolygone den Durchschnitt der normalen Hotelbereiche stark beeinflussen. Die hohe Standardabweichung unterstützt diese Annahme. Andererseits zeigt der niedrigere Median, dass die meisten Hotelpolygone tatsächlich kleiner sind als die gepufferten Polygone, und nur einige große Hotelbereiche den Mittelwert erhöhen.
+
+### Zusammenfassung:
+- Die **Timing Advance**-Werte sind in den gepufferten Bereichen geringer, was darauf hindeutet, dass diese Bereiche näher an den Mobilfunkmasten liegen.
+
+- Die **Signalstärke (RSRP)** ist in den gepufferten Bereichen tendenziell besser als in den Hotelbereichen.
+
+- Die **Signalqualität (RSRQ)** zeigt keine signifikanten Unterschiede zwischen den beiden Datensätzen.
+
+- Die **Flächen** der normalen Hotelpolygone sind im Mittel größer, allerdings zeigt der Median, dass die meisten Hotelpolygone tatsächlich kleiner als die gepufferten Polygone sind.
+
+Diese Unterschiede könnten auf die spezifische Geometrie der Hotelbereiche und deren Umgebung sowie auf die Netzwerkkonfiguration hinweisen.
 
 # Explorative Datenanalyse (EDA)
 ## Univariate Analyse

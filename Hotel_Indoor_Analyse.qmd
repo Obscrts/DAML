@@ -663,7 +663,7 @@ Wir verwenden die Methode `.isnull()` in Kombination mit `.sum()`, um zu überpr
 #| label: find NAs
 
 # Überprüfen, wie viele fehlende Werte es in jeder Spalte gibt
-na_counts = final_combined_df.isnull().sum()
+na_counts = new_filtered_final_combined_df.isnull().sum()
 print(na_counts)
 ```
 

@@ -498,7 +498,7 @@ Im **Boxplot** ist deutlich erkennbar, dass es eine Vielzahl von Ausreißern gib
 
 ### Verteilung der Variablen RSRP und RSRQ
 ```{python}
-#| label: univariate analysis - rsrp and rsrq
+#| label: univariate analysis - rsrp histogram
 
 # Histogramm der RSRP
 plt.figure(figsize=(8, 6))
@@ -508,6 +508,14 @@ plt.xlabel('RSRP (dBm)')
 plt.ylabel('Anzahl')
 plt.grid(True)
 plt.show()
+```
+
+Das Histogramm zeigt die Verteilung der gemessenen **RSRP-Werte (Reference Signal Received Power)**. Die Verteilung der Werte ist leicht rechtssteil, was darauf hindeutet, dass sich die meisten RSRP-Werte zwischen **-120 dBm** und **-80 dBm** bewegen. Dies ist typisch für Mobilfunknetze, bei denen eine akzeptable bis gute Signalstärke im Bereich um **-100 dBm** liegt.
+
+Die Verteilung weist auf eine Konzentration der Daten in einem Bereich hin, der für viele Hotels eine ausreichende Netzabdeckung bietet. Einige Werte sind am unteren Ende des Spektrums verteilt, was auf schlechtere Signalstärken in bestimmten Bereichen hindeuten könnte. Insgesamt zeigt das Histogramm eine erwartete, typische Verteilung für diese Metrik.
+
+```{python}
+#| label: univariate analysis - rsrp boxplot
 
 # Boxplot der RSRP
 plt.figure(figsize=(10, 6))
@@ -515,6 +523,14 @@ sns.boxplot(x=final_combined_df['RSRP Avg (dBm)'])
 plt.title('Boxplot RSRP')
 plt.xlabel('Pegelwert (dBm)')
 plt.grid(True)
+```
+
+Der Boxplot **der RSRP-Werte** zeigt eine ähnliche Verteilung wie das Histogramm, jedoch verdeutlicht er auch das Vorhandensein von Ausreißern. Die Box des Boxplots, die den **Interquartilsbereich (IQR)** darstellt, zeigt, dass der Großteil der RSRP-Werte zwischen **-110 dBm** und **-90 dBm** liegt, was als moderate bis gute Signalstärke angesehen werden kann.
+
+Die wenigen Punkte außerhalb der "Whiskers" repräsentieren **Ausreißer**, die auf besonders schlechte Signalbedingungen hinweisen könnten. Diese Ausreißer werden in späteren Analyseschritten noch bereinigt, um eine genauere Auswertung zu ermöglichen.
+
+```{python}
+#| label: univariate analysis - rsrq histogram
 
 # Histogramm der RSRQ
 plt.figure(figsize=(8, 6))
@@ -524,6 +540,14 @@ plt.xlabel('RSRQ (dB)')
 plt.ylabel('Anzahl')
 plt.grid(True)
 plt.show()
+```
+
+Das Histogramm zeigt die Verteilung der gemessenen **RSRQ-Werte (Reference Signal Received Quality)**. Die Verteilung der Daten ist symmetrisch und konzentriert sich um einen Mittelwert von etwa **-10 dB**. Die meisten Werte liegen zwischen **-12 dB** und **-8 dB**, was auf eine durchschnittliche bis gute Signalqualität hinweist.
+
+Diese Verteilung entspricht den Erwartungen in Bezug auf die Netzqualität in urbanen Gebieten, da RSRQ die Effizienz der genutzten Signalressourcen angibt. Die Werte, die unter **-12 dB** fallen, könnten auf überlastete Netzwerke oder Bereiche mit hoher Interferenz hinweisen.
+
+```{python}
+#| label: univariate analysis - rsrq boxplot
 
 # Boxplot RSRQ
 plt.figure(figsize=(10, 6))
@@ -533,9 +557,13 @@ plt.xlabel('Pegelwert (dB)')
 plt.grid(True)
 ```
 
+Der Boxplot der **RSRQ-Werte** zeigt die typische Verteilung der Daten mit einer relativ engen Box, die den **Interquartilsabstand (IQR)** darstellt. Die Werte für RSRQ konzentrieren sich zwischen **-12 dB** und **-8 dB**, was auf eine gute Signalqualität in den meisten Bereichen hinweist.
+
+Einige wenige Punkte liegen außerhalb der Whiskers des Boxplots, was darauf hinweist, dass es **Ausreißer** gibt. Diese können auf Regionen mit schlechterer Signalqualität oder höhere Interferenzen hinweisen. Auch hier werden diese Ausreißer in späteren Analysen bereinigt.
+
 ### Verteilung der Variable Polygon-Area
 ```{python}
-#| label: univariate analysis - polygon area
+#| label: univariate analysis - area histogram
 
 # Histogramm der Polygonflächen
 plt.figure(figsize=(8, 6))
@@ -545,6 +573,14 @@ plt.xlabel('Fläche (m²)')
 plt.ylabel('Anzahl')
 plt.grid(True)
 plt.show()
+```
+
+Das **Histogramm** der Polygonflächen zeigt, dass die meisten Polygone in einer sehr kleinen Flächengröße liegen, wobei die Häufigkeit bei niedrigeren Flächenwerten besonders hoch ist. Dies deutet darauf hin, dass viele Polygone eine relativ kleine Fläche aufweisen, was zu erwarten ist, da es sich um Hotelbereiche oder vergleichbare Zonen handelt. Die Verteilung ist stark nach rechts verzerrt (rechtsschief), was bedeutet, dass einige sehr große Flächen existieren, aber diese sind selten.
+
+Dies könnte ein Hinweis auf Ausreißer in den Daten sein, die im späteren Verlauf ebenfalls bereinigt werden müssen.
+
+```{python}
+#| label: univariate analysis - area boxplot
 
 # Boxplot der Polygonflächen
 plt.figure(figsize=(10, 6))
@@ -553,6 +589,10 @@ plt.title('Boxplot der Polygonflächen')
 plt.xlabel('Fläche (m²)')
 plt.grid(True)
 ```
+
+Der **Boxplot** bestätigt die Beobachtungen aus dem Histogramm. Der Großteil der Polygonflächen liegt in einem engen Bereich um den Medianwert, während einige Werte als Ausreißer erkennbar sind, die sich signifikant von der restlichen Verteilung unterscheiden. Diese Ausreißer zeigen Polygone mit besonders großen Flächen, die deutlich von der allgemeinen Verteilung abweichen.
+
+Diese Ausreißer werden im nächsten Schritt der Analyse bereinigt, um eine genauere Datenbasis zu schaffen.
 
 ## Datenbereinigung
 ### Entfernen von Ausreißern bei TA

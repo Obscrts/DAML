@@ -537,8 +537,8 @@ plt.grid(True)
 ```
 
 ## Datenbereinigung
-### Entfernen von Ausreißern
-In diesem Abschnitt bereinigen wir die Polygonflächen-Daten, indem wir Ausreißer identifizieren und entfernen. Ausreißer sind extreme Werte, die weit außerhalb des normalen Bereichs der Daten liegen und die Analyse verzerren könnten.
+### Entfernen von Ausreißern bei TA
+In diesem Abschnitt bereinigen wir die Timing Advance (TA)-Daten, indem wir Ausreißer identifizieren und entfernen. Ausreißer sind extreme Werte, die weit außerhalb des normalen Bereichs der Daten liegen und die Analyse verzerren könnten.
 
 #### Vorgehensweise:
 Um Ausreißer zu identifizieren, verwenden wir die **Interquartilsabstand (IQR)**-Methode. Der IQR ist der Abstand zwischen dem 1. Quartil (Q1, 25%-Perzentil) und dem 3. Quartil (Q3, 75%-Perzentil). Dieser Bereich umfasst die mittleren 50% der Daten.

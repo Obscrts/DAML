@@ -445,9 +445,9 @@ Diese Unterschiede könnten auf die spezifische Geometrie der Hotelbereiche und 
 ## Univariate Analyse
 In diesem Abschnitt untersuchen wir die Verteilung einzelner Variablen (z.B. TA, RSRP, RSRQ) im Datensatz. Dies gibt uns Einblicke in die Verteilung der Daten und zeigt mögliche Ausreißer oder Anomalien.
 
-### Verteilung der Variablen TA, RSRP und RSRQ
+### Verteilung der Variable TA
 ```{python}
-#| label: univariate analysis
+#| label: univariate analysis - ta
 
 # Zuerst prüfen, ob die Spalten bereits numerisch sind
 if combined_df['RSRP Avg (dBm)'].dtype == 'object':
@@ -461,7 +461,7 @@ else:
     combined_df['TA Avg (m)'] = combined_df['TA Avg (m)'].astype(float)
 
 # Erstellen eines Histogramms für TA
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(8, 6))
 sns.histplot(combined_df['TA Avg (m)'], bins=30, kde=True)
 plt.title('Verteilung von Timing Advance (TA)')
 plt.xlabel('TA (m)')
@@ -469,12 +469,71 @@ plt.ylabel('Anzahl')
 plt.grid(True)
 plt.show()
 
-# Boxplot für RSRP und RSRQ
+# Boxplot für TA (Timing Advance)
 plt.figure(figsize=(10, 6))
-sns.boxplot(data=combined_df[['RSRP Avg (dBm)', 'RSRQ Avg (dB)']])
-plt.title('Boxplot von RSRP und RSRQ')
+sns.boxplot(x=combined_df['TA Avg (m)'])
+plt.title('Boxplot von Timing Advance (TA)')
+plt.xlabel('TA (m)')
 plt.grid(True)
 plt.show()
+```
+
+### Verteilung der Variablen RSRP und RSRQ
+```{python}
+#| label: univariate analysis - rsrp and rsrq
+
+# Histogramm der RSRP
+plt.figure(figsize=(8, 6))
+sns.histplot(final_combined_df['RSRP Avg (dBm)'], bins=30, kde=True)
+plt.title('Verteilung RSRP')
+plt.xlabel('RSRP (dBm)')
+plt.ylabel('Anzahl')
+plt.grid(True)
+plt.show()
+
+# Boxplot der RSRP
+plt.figure(figsize=(10, 6))
+sns.boxplot(x=final_combined_df['RSRP Avg (dBm)'])
+plt.title('Boxplot RSRP')
+plt.xlabel('Pegelwert (dBm)')
+plt.grid(True)
+
+# Histogramm der RSRQ
+plt.figure(figsize=(8, 6))
+sns.histplot(final_combined_df['RSRQ Avg (dB)'], bins=30, kde=True)
+plt.title('Verteilung RSRQ')
+plt.xlabel('RSRQ (dB)')
+plt.ylabel('Anzahl')
+plt.grid(True)
+plt.show()
+
+# Boxplot RSRQ
+plt.figure(figsize=(10, 6))
+sns.boxplot(x=final_combined_df['RSRQ Avg (dB)'])
+plt.title('Boxplot RSRQ')
+plt.xlabel('Pegelwert (dB)')
+plt.grid(True)
+```
+
+### Verteilung der Variable Polygon-Area
+```{python}
+#| label: univariate analysis - polygon area
+
+# Histogramm der Polygonflächen
+plt.figure(figsize=(8, 6))
+sns.histplot(final_combined_df['area_m2'], bins=30, kde=True)
+plt.title('Verteilung der Polygonflächen')
+plt.xlabel('Fläche (m²)')
+plt.ylabel('Anzahl')
+plt.grid(True)
+plt.show()
+
+# Boxplot der Polygonflächen
+plt.figure(figsize=(10, 6))
+sns.boxplot(x=final_combined_df['area_m2'])
+plt.title('Boxplot der Polygonflächen')
+plt.xlabel('Fläche (m²)')
+plt.grid(True)
 ```
 
 ## Datenbereinigung

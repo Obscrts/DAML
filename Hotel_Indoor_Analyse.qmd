@@ -632,6 +632,28 @@ plt.grid(True)
 plt.show()
 ```
 
+### Entfernen von Duplikaten
+In diesem Schritt entfernen wir alle potenziellen Duplikate im Datensatz, die möglicherweise bei der Kombination von normalem und gepuffertem Polygon-Datensatz entstanden sind. Dies ist wichtig, um sicherzustellen, dass keine doppelten Einträge die Analyse verfälschen.
+
+#### Vorgehensweise:
+- **Überprüfung auf Duplikate**: Zuerst überprüfen wir, ob der kombinierte Datensatz doppelte Zeilen enthält.
+
+- **Entfernung von Duplikaten**: Falls Duplikate vorhanden sind, entfernen wir diese, um die Integrität des Datensatzes zu gewährleisten.
+```{python}
+#| label: remove duplicates
+
+# Überprüfen, ob Duplikate im Datensatz vorhanden sind
+duplicate_count = new_filtered_final_combined_df.duplicated().sum()
+print(f"Anzahl der Duplikate im Datensatz: {duplicate_count}")
+
+# Falls Duplikate vorhanden sind, werden diese entfernt
+if duplicate_count > 0:
+    new_filtered_final_combined_df = new_filtered_final_combined_df.drop_duplicates()
+    print(f"Anzahl der Einträge nach dem Entfernen von Duplikaten: {len(final_combined_df)}")
+else:
+    print("Keine Duplikate im Datensatz gefunden.")
+```
+
 ### Finden von NA’s
 In diesem Abschnitt untersuchen wir, ob es fehlende Werte (NA’s) in den Daten gibt. Fehlende Werte können die Analyse verfälschen und müssen behandelt werden.
 

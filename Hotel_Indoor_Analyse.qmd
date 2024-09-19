@@ -337,6 +337,13 @@ Im nächsten Schritt zeigen wir die ersten Zeilen des Datensatzes an, um sicherz
 display(final_combined_df.head())
 ```
 
+# Vergleich der Datensätze
+In diesem Abschnitt vergleichen wir die **Hotel-Daten** mit denen der **Buffered Polygon-Daten**, um Unterschiede in den Metriken zu identifizieren. Die normalen Hotel-Daten repräsentieren die tatsächlichen Hotelbereiche, während die Buffered Polygon-Daten größere, gepufferte Bereiche um die Hotels abdecken.
+
+## Vorgehensweise:
+- **Segmentierung nach Typ**: Wir segmentieren den kombinierten Datensatz in die zwei Kategorien *normal* (Hotel-Daten) und *buffered* (Buffered Polygon-Daten).
+
+- **Statistischer Vergleich**: Für jede Gruppe berechnen wir Mittelwert, Median und Standardabweichung relevanter Metriken, wie TA, RSRP und RSRQ. Dies gibt uns Aufschluss darüber, wie sich die Netzqualität zwischen den tatsächlichen Hotelbereichen und den gepufferten Zonen unterscheidet.
 ```{python}
 #| label: first look on polygon area
 

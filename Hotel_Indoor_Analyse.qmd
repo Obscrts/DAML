@@ -39,6 +39,11 @@ format:
     smooth-scroll: true
     code-fold: true
     code-summary: "Code anzeigen"
+    code-links:
+      - text: Github Repo
+        icon: file-code
+        href: https://github.com/Obscrts/DAML
+    embed-resources: true
 execute:
   echo: true
   eval: true

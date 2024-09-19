@@ -358,7 +358,7 @@ In diesem Abschnitt vergleichen wir die **Hotel-Daten** mit denen der **Buffered
 #| label: compare datasets
 
 # Überprüfen der Datentypen
-print(final_combined_df.dtypes)
+display(final_combined_df.dtypes)
 
 # Sicherstellen, dass relevante Metriken numerisch sind
 final_combined_df['TA Avg (m)'] = pd.to_numeric(final_combined_df['TA Avg (m)'], errors='coerce')

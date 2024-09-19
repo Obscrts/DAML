@@ -47,8 +47,9 @@ format:
 execute:
   echo: true
   eval: true
-  output: true
+  output: asis
   warning: false
+  message: false
   error: false
   embed: false
   cache: true

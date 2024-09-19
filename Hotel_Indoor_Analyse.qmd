@@ -94,6 +94,7 @@ Eine detaillierte Erklärung der Metriken und deren Bedeutung erfolgt im weitere
 Für die Analyse dieses Datensatzes werden verschiedene Python-Bibliotheken benötigt, die essenzielle Funktionen zur Datenverarbeitung und -visualisierung bereitstellen. Zu den wichtigsten Bibliotheken zählen:
 
 - **pandas**: Eine leistungsstarke Bibliothek zur Datenmanipulation und -analyse. Sie wird verwendet, um Daten aus CSV-Dateien zu laden und in einem DataFrame-Format darzustellen, das eine effiziente Analyse ermöglicht.
+- **geopandas**: Eine Erweiterung von Pandas, die speziell für die Arbeit mit räumlichen Daten entwickelt wurde. Sie ermöglicht es, geografische Daten aus verschiedenen Formaten wie GeoJSON oder Shapefiles zu laden und in einem GeoDataFrame zu speichern, das die Funktionalität von Pandas mit der Möglichkeit zur Analyse von Geometrien wie Punkten, Linien und Polygonen kombiniert.
 
 - **numpy**: Diese Bibliothek bietet mathematische Funktionen für numerische Operationen und unterstützt insbesondere bei der Verarbeitung großer Datenmengen und Arrays.
 

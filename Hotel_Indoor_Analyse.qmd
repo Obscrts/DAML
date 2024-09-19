@@ -335,7 +335,7 @@ Im nächsten Schritt zeigen wir die ersten Zeilen des Datensatzes an, um sicherz
 ```{python}
 #| label: first look on combined df
 
-display(final_combined_df.head())
+display(final_combined_df[['Period Start Time', 'Name', 'RRC Connection Setup Attempts', 'RSRP Avg (dBm)', 'RSRQ Avg (dB)', 'TA Avg (m)', 'area_m2']].head())
 ```
 
 # Vergleich der Datensätze

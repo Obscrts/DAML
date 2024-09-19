@@ -270,8 +270,61 @@ final_combined_df = pd.merge(combined_df, polygon_areas_df, left_on='extracted_n
 final_combined_df.drop(['name', 'extracted_name'], axis=1, inplace=True)
 ```
 
-## Beschreibung der Spalten
-Detaillierte Beschreibung der wichtigsten Spalten, z.B. RSRP, RSRQ, TA, sowie zusätzliche Metriken aus den buffered Polygons und GeoJSON-Daten.
+## Beschreibung der wichtigsten Spalten
+
+In diesem Abschnitt werden die relevantesten Spalten des Datensatzes beschrieben, die für die Analyse der Mobilfunknetzqualität von Bedeutung sind. Diese Metriken sind entscheidend, um die Netzqualität sowie die Verbindungsstabilität und -leistung zu bewerten.
+
+### RSRP Avg (dBm)
+   - **Beschreibung**: *Reference Signal Received Power* (RSRP) ist eine Metrik, die die empfangene Signalstärke eines Mobilfunkgeräts in Dezibel Milliwatt (dBm) misst.
+
+   - **Bedeutung**: Diese Metrik gibt an, wie stark das Mobilfunksignal ist, das von der Basisstation zum Endgerät gesendet wird. Je höher der RSRP-Wert, desto besser ist die Signalstärke. Typische Werte liegen zwischen -140 dBm (schlecht) und -44 dBm (sehr gut).
+
+   - **Interpretation**: RSRP ist eine Schlüsselmetrik zur Bewertung der Verbindungsqualität. Schwache Werte deuten darauf hin, dass das Endgerät möglicherweise weit von der Basisstation entfernt ist oder Hindernisse die Signalstärke beeinträchtigen.
+
+### RSRQ Avg (dB)
+   - **Beschreibung**: *Reference Signal Received Quality* (RSRQ) misst die Qualität des empfangenen Signals in Dezibel (dB).
+
+   - **Bedeutung**: RSRQ gibt an, wie effizient das Mobilfunkgerät das empfangene Signal verwendet. Typische Werte liegen zwischen -3 dB (sehr gut) und -19 dB (schlecht). Niedrigere Werte deuten auf eine stärkere Interferenz oder eine hohe Netzwerkauslastung hin.
+
+   - **Interpretation**: RSRQ ist besonders nützlich zur Beurteilung der Signalqualität in überlasteten Netzwerken. Zusammen mit RSRP kann diese Metrik verwendet werden, um festzustellen, ob die Signalqualität durch Interferenzen oder Netzwerkauslastung beeinträchtigt ist.
+
+### TA Avg (m)
+   - **Beschreibung**: *Timing Advance* (TA) misst die Entfernung zwischen dem Mobilfunkgerät und der Basisstation in Metern.
+
+   - **Bedeutung**: Ein höherer TA-Wert bedeutet, dass das Mobilfunkgerät weiter von der Basisstation entfernt ist. Dies kann zu einer schlechteren Signalqualität und höheren Latenzen führen.
+
+   - **Interpretation**: TA ist wichtig, um zu verstehen, wie weit ein Gerät von der Basisstation entfernt ist. Höhere TA-Werte können zusammen mit niedrigeren RSRP-Werten verwendet werden, um Verbindungsprobleme zu diagnostizieren.
+
+### DL Volume (MB) & UL Volume (MB)
+   - **Beschreibung**: Diese Metriken messen das Volumen der Daten, die im Downlink (DL) und Uplink (UL) übertragen werden, in Megabyte (MB).
+
+   - **Bedeutung**: Diese Metriken sind ein Maß für die Datenmenge, die zwischen dem Endgerät und der Basisstation fließt. Ein hohes Volumen deutet auf eine intensive Nutzung des Netzwerks hin.
+
+   - **Interpretation**: Sie werden verwendet, um die Netzwerkauslastung und die Leistung des Netzwerks bei Datenübertragungen zu bewerten.
+
+### DL Throughput Avg (Mbps) & UL Throughput Avg (Mbps)
+   - **Beschreibung**: Diese Metriken messen die durchschnittliche Datenübertragungsrate im Downlink (DL) und Uplink (UL) in Megabit pro Sekunde (Mbps).
+
+   - **Bedeutung**: Höhere Durchsatzwerte deuten auf eine gute Netzwerkleistung hin, während niedrige Werte auf Engpässe oder eine schlechte Signalqualität hinweisen können.
+
+   - **Interpretation**: Der durchschnittliche Durchsatz ist ein wichtiger Indikator für die Nutzererfahrung, insbesondere bei datenintensiven Anwendungen wie Videostreaming oder großen Dateiübertragungen.
+
+### CQI Avg
+   - **Beschreibung**: Der *Channel Quality Indicator* (CQI) gibt an, wie gut der Kanal zwischen dem Mobilfunkgerät und der Basisstation ist.
+
+   - **Bedeutung**: CQI-Werte reichen von 1 (schlecht) bis 15 (sehr gut). Diese Metrik beeinflusst direkt die Modulation und Codierung, die das Netzwerk verwendet, um die Verbindung zu verwalten.
+
+   - **Interpretation**: Ein höherer CQI-Wert führt zu besseren Datenübertragungsraten, da das Netzwerk effizientere Modulations- und Kodierungstechniken verwenden kann.
+
+### RRC Connection Setup Failure Rate (%)
+   - **Beschreibung**: Misst die Rate der fehlgeschlagenen Verbindungsaufbauversuche zwischen einem Endgerät und dem Netzwerk in Prozent.
+
+   - **Bedeutung**: Eine hohe Fehlerquote weist darauf hin, dass viele Verbindungsanfragen nicht erfolgreich abgeschlossen werden. Dies kann auf Netzwerkprobleme, Überlastung oder eine schlechte Signalqualität hindeuten.
+
+   - **Interpretation**: Diese Metrik ist entscheidend, um die Stabilität des Netzwerks zu bewerten, insbesondere in Gebieten mit hoher Netzauslastung.
+---
+
+Diese Metriken spielen eine Schlüsselrolle bei der Analyse der Netzwerkkonfiguration und -leistung. Jede dieser Spalten bietet wertvolle Informationen über die Signalstärke, die Verbindungsqualität und die allgemeine Leistungsfähigkeit des Mobilfunknetzes.
 
 ## Erste Betrachtung des Datensatzes
 Bevor wir in die detaillierte Analyse einsteigen, werfen wir einen ersten Blick auf die Struktur des kombinierten Datensatzes. Dies hilft uns, die enthaltenen Spalten, die Datentypen und die ersten Werte zu verstehen. Der Datensatz enthält Informationen sowohl aus den normalen Hotel-Daten als auch den buffered polygons, wobei jeder Eintrag mit einem Typ (normal oder buffered) und einer Stadt versehen ist.

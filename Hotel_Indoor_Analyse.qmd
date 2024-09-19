@@ -549,13 +549,58 @@ Um Ausreißer zu identifizieren, verwenden wir die **Interquartilsabstand (IQR)*
 
 3. **Definition der Grenzen für Ausreißer**: Werte, die mehr als das 1,5-fache des IQR unterhalb von Q1 oder oberhalb von Q3 liegen, werden als Ausreißer betrachtet.
 
-4. **Entfernen von Ausreißern**: Alle Flächenwerte, die außerhalb der definierten Grenzen liegen, werden entfernt.
+4. **Entfernen von Ausreißern**: Alle TA-Werte, die außerhalb der definierten Grenzen liegen, werden entfernt.
 ```{python}
-#| label: removal of outsiders
+#| label: removal of TA outliers
+
+# Sicherstellen, dass alle Werte in 'TA Avg (m)' numerisch sind, ungültige Werte werden in NaN umgewandelt
+final_combined_df['TA Avg (m)'] = pd.to_numeric(final_combined_df['TA Avg (m)'], errors='coerce')
+
+# Berechnung des 1. Quartils (Q1) und des 3. Quartils (Q3) für TA
+Q1_ta = final_combined_df['TA Avg (m)'].quantile(0.25)
+Q3_ta = final_combined_df['TA Avg (m)'].quantile(0.75)
+IQR_ta = Q3_ta - Q1_ta
+
+# Definition der Schwellenwerte für TA
+lower_bound_ta = Q1_ta - 1.5 * IQR_ta
+upper_bound_ta = Q3_ta + 1.5 * IQR_ta
+
+# Entfernen von Ausreißern (TA-Werte außerhalb der definierten Grenzen)
+filtered_final_combined_df = final_combined_df[(final_combined_df['TA Avg (m)'] >= lower_bound_ta) & (final_combined_df['TA Avg (m)'] <= upper_bound_ta)]
+
+# Anzeigen der bereinigten Daten
+print(f"Vor dem Entfernen der Ausreißer bei TA: {len(final_combined_df)} Einträge")
+print(f"Nach dem Entfernen der Ausreißer bei TA: {len(filtered_final_combined_df)} Einträge")
+
+# Histogramm der bereinigten TA-Daten
+plt.figure(figsize=(8, 6))
+sns.histplot(filtered_final_combined_df['TA Avg (m)'], bins=30, kde=True)
+plt.title('Verteilung der bereinigten Timing Advance (TA) Werte')
+plt.xlabel('TA (m)')
+plt.ylabel('Anzahl')
+plt.grid(True)
+plt.show()
+
+# Boxplot der bereinigten TA-Daten
+plt.figure(figsize=(10, 6))
+sns.boxplot(x=filtered_final_combined_df['TA Avg (m)'])
+plt.title('Boxplot der bereinigten Timing Advance (TA) Werte')
+plt.xlabel('TA (m)')
+plt.grid(True)
+plt.show()
+```
+
+### Entfernen von Ausreißern bei den Polygonflächen
+In diesem Abschnitt bereinigen wir die Polygonflächen-Daten, indem wir Ausreißer identifizieren und entfernen. Ausreißer sind extreme Werte, die weit außerhalb des normalen Bereichs der Daten liegen und die Analyse verzerren könnten.
+
+#### Vorgehensweise:
+Um Ausreißer zu identifizieren, verwenden wir ebenfalls die **Interquartilsabstand (IQR)-Methode**.
+```{python}
+#| label: removal of area outliers
 
 # Berechnung des 1. Quartils (Q1) und des 3. Quartils (Q3)
-Q1 = polygon_areas_df['area_m2'].quantile(0.25)
-Q3 = polygon_areas_df['area_m2'].quantile(0.75)
+Q1 = filtered_final_combined_df['area_m2'].quantile(0.25)
+Q3 = filtered_final_combined_df['area_m2'].quantile(0.75)
 IQR = Q3 - Q1
 
 # Definition der Schwellenwerte für die Fläche
@@ -563,15 +608,15 @@ lower_bound = Q1 - 1.5 * IQR
 upper_bound = Q3 + 1.5 * IQR
 
 # Entfernen von Ausreißern (Polygone außerhalb der definierten Grenzen)
-polygon_areas_filtered_df = polygon_areas_df[(polygon_areas_df['area_m2'] >= lower_bound) & (polygon_areas_df['area_m2'] <= upper_bound)]
+new_filtered_final_combined_df = filtered_final_combined_df[(final_combined_df['area_m2'] >= lower_bound) & (final_combined_df['area_m2'] <= upper_bound)]
 
 # Anzeigen der bereinigten Daten
-print(f"Vor dem Entfernen der Ausreißer: {len(polygon_areas_df)} Polygone")
-print(f"Nach dem Entfernen der Ausreißer: {len(polygon_areas_filtered_df)} Polygone")
+print(f"Vor dem Entfernen der Ausreißer: {len(filtered_final_combined_df)} Polygone")
+print(f"Nach dem Entfernen der Ausreißer: {len(new_filtered_final_combined_df)} Polygone")
 
 # Histogramm der bereinigten Polygonflächen
-plt.figure(figsize=(10, 6))
-sns.histplot(polygon_areas_filtered_df['area_m2'], bins=30, kde=True)
+plt.figure(figsize=(8, 6))
+sns.histplot(new_filtered_final_combined_df['area_m2'], bins=30, kde=True)
 plt.title('Verteilung der bereinigten Polygonflächen')
 plt.xlabel('Fläche (m²)')
 plt.ylabel('Anzahl')
@@ -580,7 +625,7 @@ plt.show()
 
 # Boxplot der bereinigten Polygonflächen
 plt.figure(figsize=(10, 6))
-sns.boxplot(x=polygon_areas_filtered_df['area_m2'])
+sns.boxplot(x=new_filtered_final_combined_df['area_m2'])
 plt.title('Boxplot der bereinigten Polygonflächen')
 plt.xlabel('Fläche (m²)')
 plt.grid(True)

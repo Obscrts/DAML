@@ -101,7 +101,6 @@ Eine detaillierte Erklärung der Metriken und deren Bedeutung erfolgt im weitere
 | `seaborn`      | Erleichtert das Erstellen informativer Visualisierungen, baut auf matplotlib auf und bietet erweiterte Funktionen für die Visualisierung von Datenbeziehungen. |
 | `os`           | Dient zur Interaktion mit dem Betriebssystem, insbesondere zur Arbeit mit Dateistrukturen und Dateipfaden für den Zugriff auf CSV-Dateien.   |
  `scikit-learn`  | Bietet eine Vielzahl von Machine-Learning-Algorithmen, z. B. für lineare Regression und Random Forests, zum Trainieren und Evaluieren von Modellen.  |
- `tqdm`  | Zeigt Fortschrittsbalken für iterative Prozesse wie Schleifen oder die Hyperparameter-Suche an und erhöht so die Übersichtlichkeit.     |
 
 ```{python}
 #| label: setup - importing libraries

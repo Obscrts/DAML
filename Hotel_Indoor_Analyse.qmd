@@ -661,7 +661,7 @@ plt.show()
 Der Boxplot zeigt, dass die meisten TA-Werte im Bereich von etwa 0 bis 600 Metern liegen, mit wenigen Ausreißern im Bereich über 600 Metern. Der Median der TA-Werte liegt bei etwa 300 Metern. Insgesamt wurde durch die Bereinigung der Ausreißer die Verteilung der TA-Werte stabilisiert und extreme Werte entfernt.
 
 ### Entfernen von Ausreißern bei den Polygonflächen
-In diesem Abschnitt bereinigen wir die Polygonflächen-Daten, indem wir Ausreißer identifizieren und entfernen. Ausreißer sind extreme Werte, die weit außerhalb des normalen Bereichs der Daten liegen und die Analyse verzerren könnten.
+In diesem Abschnitt bereinigen wir die Polygonflächen, indem wir Ausreißer identifizieren und entfernen. Ausreißer sind extreme Werte, die weit außerhalb des normalen Bereichs der Daten liegen und die Analyse verzerren könnten.
 
 #### Vorgehensweise:
 Um Ausreißer zu identifizieren, verwenden wir ebenfalls die **Interquartilsabstand (IQR)-Methode**.

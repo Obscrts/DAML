@@ -73,19 +73,13 @@ Eine detaillierte Erklärung der Metriken und deren Bedeutung erfolgt im weitere
 
    - **Mögliche Analyse**: Korrelation zwischen TA und den Signalqualitätsmetriken RSRP/RSRQ; Erstellung von Scatterplots; lineare Regressionsmodelle.
 
-2. **Hotels in dichter besiedelten Gebieten haben im Durchschnitt eine schlechtere Netzqualität als Hotels in weniger dicht besiedelten Gebieten**
-
-   - **Begründung**: Städtische Gebiete haben tendenziell mehr Netzwerkauslastung, was zu schlechteren Signalstärken und höheren Verbindungsfehlern führen könnte.
-   
-   - **Mögliche Analyse**: Durch den Einsatz von geospatialen Daten und den Polygonflächen könnte untersucht werden, ob Hotels in urbanen Gebieten signifikant schlechtere Netzqualitäten aufweisen. Eine Clusteranalyse könnte basierend auf der geografischen Lage und den Signalqualitäten durchgeführt werden.
-
-3. **Hotels mit hoher Datenübertragungsrate (DL/UL Throughput) zeigen eine bessere Signalqualität (RSRP, RSRQ) als Hotels mit niedriger Datenübertragungsrate**
+2. **Hotels mit hoher Datenübertragungsrate (DL/UL Throughput) zeigen eine bessere Signalqualität (RSRP, RSRQ) als Hotels mit niedriger Datenübertragungsrate**
 
    - **Begründung**: Eine bessere Signalqualität sollte mit höheren Datenübertragungsraten (DL/UL Throughput) einhergehen.
 
    - **Mögliche Analyse**: Untersuchung der Korrelation zwischen DL/UL Throughput und den Signalqualitätsmetriken; Erstellung von Scatterplots; lineare Regression.
 
-4. **Es existieren räumliche Cluster von Hotels mit ähnlicher Netzqualität in bestimmten geographischen Regionen**
+3. **Es existieren räumliche Cluster von Hotels mit ähnlicher Netzqualität in bestimmten geographischen Regionen**
 
    - **Begründung**: Geografische Faktoren wie die Nähe zu Netzwerkinfrastrukturen oder das städtische/rurale Umfeld könnten Einfluss auf die Netzqualität nehmen.
 

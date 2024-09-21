@@ -685,6 +685,9 @@ print(f"Vor dem Entfernen der Ausreißer: {len(filtered_final_combined_df)} Poly
 print(f"Nach dem Entfernen der Ausreißer: {len(new_filtered_final_combined_df)} Polygone\n")
 ```
 
+```{python}
+#| label: cleaned area histogram
+
 # Histogramm der bereinigten Polygonflächen
 plt.figure(figsize=(8, 6))
 sns.histplot(new_filtered_final_combined_df['area_m2'], bins=30, kde=True)
@@ -693,6 +696,10 @@ plt.xlabel('Fläche (m²)')
 plt.ylabel('Anzahl')
 plt.grid(True)
 plt.show()
+```
+
+Nach der Entfernung der Ausreißer mithilfe der **Interquartilsabstand (IQR)-Methode** zeigt sich eine bereinigte Verteilung der Polygonflächen. Wie im Histogramm erkennbar, hat sich der Bereich der Polygonflächen deutlich eingegrenzt, wobei die meisten Flächen unter 1000 m² liegen. Auch die abnehmende Häufigkeit bei größeren Flächen ist ersichtlich, wobei die Verteilung insgesamt nun homogener erscheint.
+
 
 # Boxplot der bereinigten Polygonflächen
 plt.figure(figsize=(10, 6))

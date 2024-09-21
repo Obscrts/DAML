@@ -208,7 +208,7 @@ Um die Flächen der Polygone zu berechnen, werden die GeoJSON-Dateien für jede 
 4. **Erstellen der **Name**-Spalte**: Der Name wird basierend auf der Cluster-ID und der Polygon-ID generiert, um die Daten später mit den Hotels zu verknüpfen.
 
 ```{python}
-#| label: calculate polygon area sizes
+#| label: calculate polygon area sizes with centroids
 
 # Liste der GeoJSON-Dateien (cluster_01 bis cluster_99)
 cluster_files = [f'resources/data/polygons/cluster_{i:02}.geojson' for i in range(1, 100)]
@@ -224,9 +224,8 @@ excluded_files = [
 # Liste, um die Ergebnisse zu speichern
 polygon_areas = []
 
-# Einlesen der GeoJSON-Dateien und Berechnung der Polygonflächen
+# Einlesen der GeoJSON-Dateien und Berechnung der Polygonflächen und Centroid-Koordinaten
 for cluster_file in cluster_files:
-    # Überspringen der ausgeschlossenen Dateien
     if cluster_file in excluded_files:
         continue
     
@@ -240,24 +239,31 @@ for cluster_file in cluster_files:
         # Berechnung der Fläche jedes Polygons (in Quadratmetern)
         gdf['area_m2'] = gdf.geometry.area
         
+        # Berechnung der Centroids (Mittelpunkte) der Polygone
+        gdf['centroid'] = gdf.geometry.centroid
+        
+        # Extrahieren der Latitude und Longitude aus dem Centroid
+        gdf['Latitude'] = gdf['centroid'].y
+        gdf['Longitude'] = gdf['centroid'].x
+        
         # Extrahieren der Cluster-ID aus dem Dateinamen
         cluster_id = cluster_file.split('_')[-1].split('.')[0]  # Gibt z.B. "01" für "cluster_01.geojson" zurück
         
         # Generieren des Namens nach dem Schema XX#YY, wobei XX die Cluster-ID und YY die Polygon-ID ist
         gdf['name'] = [f"{cluster_id}#{str(i+1).zfill(2)}" for i in range(len(gdf))]
         
-        # Speichern der Ergebnisse (Name des Polygons und seine Fläche)
-        polygon_areas.append(gdf[['name', 'area_m2']])
+        # Speichern der Ergebnisse (Name des Polygons, Fläche und Centroid-Koordinaten)
+        polygon_areas.append(gdf[['name', 'area_m2', 'Latitude', 'Longitude']])
         
     except FileNotFoundError:
         print(f"GeoJSON-Datei {cluster_file} nicht gefunden.")
     except Exception as e:
         print(f"Fehler bei der Verarbeitung von {cluster_file}: {e}")
 
-# Alle Polygonflächen zusammenführen
+# Alle Polygonflächen und Centroids zusammenführen
 polygon_areas_df = pd.concat(polygon_areas, ignore_index=True)
 
-# Anzeigen der ersten Zeilen der berechneten Flächen mit den generierten Namen
+# Anzeigen der ersten Zeilen der berechneten Flächen mit den generierten Namen und Centroid-Koordinaten
 display(polygon_areas_df.head(10))
 ```
 

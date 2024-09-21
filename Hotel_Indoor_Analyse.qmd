@@ -646,6 +646,8 @@ plt.show()
 
 Nach dem Entfernen der Ausreißer zeigt das Histogramm eine gleichmäßigere Verteilung der TA-Werte. Die Verteilung reicht nun von 0 bis etwa 850 Meter. Die meisten Werte liegen zwischen 100 und 400 Metern, was auf eine typische Entfernung der Endgeräte zur Basisstation hindeutet. Die Häufigkeit der Werte nimmt nach 400 Metern deutlich ab.
 
+```{python}
+#| label: cleaned TA boxplot
 
 # Boxplot der bereinigten TA-Daten
 plt.figure(figsize=(10, 6))
@@ -655,6 +657,8 @@ plt.xlabel('TA (m)')
 plt.grid(True)
 plt.show()
 ```
+
+Der Boxplot zeigt, dass die meisten TA-Werte im Bereich von etwa 0 bis 600 Metern liegen, mit wenigen Ausreißern im Bereich über 600 Metern. Der Median der TA-Werte liegt bei etwa 300 Metern. Insgesamt wurde durch die Bereinigung der Ausreißer die Verteilung der TA-Werte stabilisiert und extreme Werte entfernt.
 
 ### Entfernen von Ausreißern bei den Polygonflächen
 In diesem Abschnitt bereinigen wir die Polygonflächen-Daten, indem wir Ausreißer identifizieren und entfernen. Ausreißer sind extreme Werte, die weit außerhalb des normalen Bereichs der Daten liegen und die Analyse verzerren könnten.

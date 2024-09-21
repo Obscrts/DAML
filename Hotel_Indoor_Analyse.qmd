@@ -278,7 +278,7 @@ combined_df['extracted_name'] = combined_df['Name'].str.extract(r'(\d{2}#\d{2})'
 final_combined_df = pd.merge(combined_df, polygon_areas_df, left_on='extracted_name', right_on='name', how='left')
 
 # Entfernen der Spalten "name" und "extracted_name" aus dem finalen DataFrame
-final_combined_df.drop(['name', 'extracted_name'], axis=1, inplace=True)
+final_combined_df.drop(['name'], axis=1, inplace=True)
 ```
 
 ## Beschreibung der wichtigsten Spalten

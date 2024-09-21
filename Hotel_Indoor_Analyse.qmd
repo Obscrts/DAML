@@ -946,6 +946,455 @@ Die Heatmap verdeutlicht die Konzentration der Datenpunkte in einem Bereich schl
 ### Schlussfolgerung
 Die Daten bestätigen teilweise die These, da eine höhere Datenübertragungsrate mit einer Verbesserung der Signalqualität in Bezug auf RSRP und RSRQ korreliert. Dennoch ist die Korrelation nicht besonders stark. Dies deutet darauf hin, dass weitere Faktoren wie Netzwerkauslastung, geografische Lage und die Struktur der Umgebung einen erheblichen Einfluss auf die Signalqualität haben.
 
+## These 3: Es existieren räumliche Cluster von Hotels mit ähnlicher Netzqualität in bestimmten geographischen Regionen
+### Korrelation von geografischer Lage und Signalqualität
+In dieser Analyse wird untersucht, ob es eine räumliche Verteilung der Signalqualitätsmetriken RSRP und RSRQ gibt. Dazu wird eine räumliche Clusteranalyse durchgeführt, die geografische Informationen (Längen- und Breitengrade) der Hotels sowie deren Netzqualitätsdaten einbezieht. Ziel ist es, geographische Muster in der Signalqualität zu identifizieren und Regionen mit ähnlichen Netzwerkmessungen zu gruppieren.
+
+Zur Identifizierung räumlicher Cluster verwenden wir den **DBSCAN-Algorithmus** (Density-Based Spatial Clustering of Applications with Noise). DBSCAN ist ein Clustering-Verfahren, das besonders gut für die Analyse von geografischen Mustern geeignet ist, da es Cluster auf Basis der Dichte von Datenpunkten bildet. Es eignet sich besonders gut zur Entdeckung von Regionen, die sich in Bezug auf ihre Signalqualität ähneln.
+```{python}
+#| label: thesis 3 - dbscan clustering
+
+# Sicherstellen, dass die Spalte 'extracted_name' existiert
+new_filtered_final_combined_df['extracted_name'] = new_filtered_final_combined_df['Name'].str.extract(r'(\d{2}#\d{2})')
+
+# Zusammenführen des Polygon-Datensatzes mit den bereinigten Hotel-Daten
+final_combined_df_with_centroids = pd.merge(new_filtered_final_combined_df, 
+                                            polygon_areas_df[['name', 'Latitude', 'Longitude']], 
+                                            left_on='extracted_name', 
+                                            right_on='name', how='left')
+
+# Umbenennen der Latitude und Longitude Spalten nach dem Merge
+final_combined_df_with_centroids.rename(columns={'Latitude_y': 'Latitude', 'Longitude_y': 'Longitude'}, inplace=True)
+
+# Auswahl der relevanten Spalten (Breitengrad, Längengrad, RSRP, RSRQ, City)
+geo_features = ['Latitude', 'Longitude', 'RSRP Avg (dBm)', 'RSRQ Avg (dB)', 'city']
+geo_df = final_combined_df_with_centroids[geo_features].dropna()
+
+# Standardisierung der Daten
+scaler = StandardScaler()
+geo_scaled = scaler.fit_transform(geo_df[['Latitude', 'Longitude', 'RSRP Avg (dBm)', 'RSRQ Avg (dB)']])
+
+# Anwendung des DBSCAN-Clustering Algorithmus
+dbscan = DBSCAN(eps=0.3, min_samples=10).fit(geo_scaled)
+
+# Cluster-Labels zu den Daten hinzufügen
+geo_df['Cluster'] = dbscan.labels_
+
+# Visualisierung der Cluster auf der Karte
+gdf = gpd.GeoDataFrame(geo_df, geometry=gpd.points_from_xy(geo_df['Longitude'], geo_df['Latitude']))
+
+# Laden der Natural Earth Daten von lokalem Pfad
+world = gpd.read_file('resources/data/maps/ne_110m_admin_0_countries.shp')
+
+# Anpassung der Markierungsgröße und bessere Farbskalenbeschriftung
+fig, ax = plt.subplots(figsize=(12, 8))
+
+# Kartenplot
+world.plot(ax=ax, color='lightgray')
+
+# Diskrete Farbpallette für Cluster erstellen
+cluster_colors = plt.cm.get_cmap('coolwarm', len(set(geo_df['Cluster'])))
+
+# Plotten der Cluster ohne automatische Farbskala
+gdf.plot(column='Cluster', ax=ax, cmap=cluster_colors, markersize=70, alpha=0.7, legend=False)
+
+# Anpassung der Achsenlimits auf den Bereich der Daten
+ax.set_xlim(gdf['Longitude'].min() - 50000, gdf['Longitude'].max() + 50000)
+ax.set_ylim(gdf['Latitude'].min() - 50000, gdf['Latitude'].max() + 50000)
+
+# Titel und Achsenbeschriftungen anpassen
+plt.title('Cluster der Hotels nach Signalqualität', fontsize=14, pad=20)
+plt.xlabel('Longitude', fontsize=12)
+plt.ylabel('Latitude', fontsize=12)
+
+# Farbskala hinzufügen und anpassen
+norm = plt.Normalize(vmin=geo_df['Cluster'].min(), vmax=geo_df['Cluster'].max())
+cbar = plt.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cluster_colors), ax=ax, orientation='vertical')
+cbar.set_label('Cluster-Zuordnung (Signalqualität)', fontsize=12)
+
+# Berechnung der Cluster-Zentren, nur für numerische Spalten (Longitude, Latitude)
+cluster_centers = gdf.groupby('Cluster')[['Longitude', 'Latitude']].mean()
+
+# Städte pro Cluster, nimm die am häufigsten vorkommende Stadt (Modus), oder eine alternative Stadt, falls Modus leer ist
+def get_city_for_cluster(x):
+    if not x.mode().empty:  # Falls ein Modus vorhanden ist, wähle diesen
+        return x.mode().iloc[0]
+    else:  # Falls nicht, nehme den letzten verfügbaren Wert
+        return x.iloc[-1] if len(x) > 0 else 'Unbekannt'
+
+cluster_cities = gdf.groupby('Cluster')['city'].apply(get_city_for_cluster)
+
+# Set zur Überprüfung, ob eine Stadt bereits beschriftet wurde
+annotated_clusters = set()
+
+# Annotation der Cluster-Zentren mit Stadtnamen und Cluster-ID
+for idx, row in cluster_centers.iterrows():
+    city_name = cluster_cities.get(idx, 'Unbekannt')  # Falls kein gültiger Eintrag, setze 'Unbekannt'
+    
+    # Prüfe, ob die Stadt bereits annotiert wurde
+    if city_name not in annotated_clusters:
+        annotated_clusters.add(city_name)  # Markiere die Stadt als annotiert
+        ax.annotate(f"{city_name}", 
+                    xy=(row['Longitude'], row['Latitude']), 
+                    xytext=(3, 3),  # Text leicht verschieben, um Überlappung zu vermeiden
+                    textcoords='offset points', 
+                    fontsize=10, color='black', weight='bold', 
+                    bbox=dict(boxstyle="round,pad=0.3", edgecolor='black', facecolor='white'),
+                    arrowprops=dict(facecolor='black', arrowstyle='->', lw=1))
+plt.show()
+```
+
+**Erkenntnisse**:
+
+**Berlin (BER)** und **Dortmund (DOR)** zeigen starke Cluster mit homogener Signalqualität.
+Städte wie **Hamburg (HH)** und **Frankfurt (FFM)** weisen eine größere Streuung auf, was auf eine uneinheitliche Netzqualität hinweisen könnte.
+In südlicheren Regionen, wie **Stuttgart (STG)** und **München (MUC)**, gibt es klare räumliche Unterschiede in der Netzabdeckung, was durch die Clusterfarbe angezeigt wird.
+
+### Clusteranalyse der Signalqualität
+Die DBSCAN-Analyse zeigt, wie die Hotels geografisch in Cluster unterteilt werden, basierend auf der Nähe und ähnlichen Signalqualitätsmetriken (RSRP, RSRQ). Die Hotels in denselben geografischen Regionen tendieren dazu, ähnliche Netzqualität aufzuweisen.
+```{python}
+
+```
+
+Dieser Abschnitt erstellt eine visuelle Darstellung der Signalqualitätsmetriken (RSRP und RSRQ), um zu veranschaulichen, wie sich die verschiedenen Cluster in Bezug auf die Netzqualität verhalten. Die Farben der Cluster zeigen Hotels, die ähnliche Signalqualität aufweisen und räumlich nahe beieinander liegen.
+
+### Konzentration der Signalqualität
+Die nachfolgenden Heatmaps zeigen die Dichteverteilung der beiden Metriken **RSRP** (Reference Signal Received Power) und **RSRQ** (Reference Signal Received Quality) für verschiedene Cluster, die in der DBSCAN-Analyse identifiziert wurden. Diese Verteilung gibt Aufschluss darüber, wie die Signalqualität in den verschiedenen Clustern verteilt ist.
+```{python}
+#| label: thesis 3 - heatmap grid - part 1
+
+# Extrahiere die eindeutigen Cluster-Labels
+clusters = np.sort(geo_df['Cluster'].unique())[:2]
+
+# Anzahl der Zeilen und Spalten für das Grid
+num_cols = 2
+num_rows = 1  # Nur eine Reihe für 2 Cluster
+
+# Erstelle eine Figure mit einem Grid von Subplots
+fig, axes = plt.subplots(num_rows, num_cols, figsize=(8, 4))
+axes = axes.flatten()
+
+# Erstellen von Heatmaps für jeden Cluster
+for i, cluster in enumerate(clusters):
+    cluster_data = geo_df[geo_df['Cluster'] == cluster]
+    
+    sns.kdeplot(
+        x=cluster_data['RSRP Avg (dBm)'],
+        y=cluster_data['RSRQ Avg (dB)'],
+        cmap='viridis', shade=True, thresh=0.05, ax=axes[i]
+    )
+    axes[i].set_title(f'Heatmap für Cluster {cluster}: RSRP und RSRQ')
+    axes[i].set_xlabel('RSRP (dBm)')
+    axes[i].set_ylabel('RSRQ (dB)')
+    axes[i].grid(True)
+
+plt.tight_layout()
+plt.show()
+```
+
+Die erste Heatmap zeigt den Cluster -1, welcher als "Noise" betrachtet wird. Das bedeutet, dass die Punkte in diesem Cluster nicht eindeutig einer Gruppe zugeordnet werden konnten. Diese Punkte könnten außerhalb von dichten Hotelbereichen liegen oder atypische Signalwerte aufweisen.
+
+In der zweiten Heatmap sehen wir Cluster 0. Hier sind die Punkte gut konzentriert, was darauf hinweist, dass die Hotels in diesem Cluster eine relativ homogene Signalqualität aufweisen.
+
+**Interpretation**:
+
+- **Cluster -1 (Noise)**: Dieser Cluster umfasst Punkte, die keinem spezifischen Cluster zugeordnet werden konnten. Die Signalqualität dieser Hotels ist oft instabil und variabel.
+   
+- **Cluster 0**: Zeigt eine relativ enge Verteilung der Signalqualitätswerte, was auf eine stabile Netzabdeckung hinweist.
+```{python}
+#| label: thesis 3 - heatmap grid - part 2
+
+# Extrahiere die nächsten Cluster-Labels
+clusters = np.sort(geo_df['Cluster'].unique())[2:4]
+
+# Anzahl der Zeilen und Spalten für das Grid
+num_cols = 2
+num_rows = 1  # Nur eine Reihe für 2 Cluster
+
+# Erstelle eine Figure mit einem Grid von Subplots
+fig, axes = plt.subplots(num_rows, num_cols, figsize=(8, 4))
+axes = axes.flatten()
+
+# Erstellen von Heatmaps für jeden Cluster
+for i, cluster in enumerate(clusters):
+    cluster_data = geo_df[geo_df['Cluster'] == cluster]
+    
+    sns.kdeplot(
+        x=cluster_data['RSRP Avg (dBm)'],
+        y=cluster_data['RSRQ Avg (dB)'],
+        cmap='viridis', shade=True, thresh=0.05, ax=axes[i]
+    )
+    axes[i].set_title(f'Heatmap für Cluster {cluster}: RSRP und RSRQ')
+    axes[i].set_xlabel('RSRP (dBm)')
+    axes[i].set_ylabel('RSRQ (dB)')
+    axes[i].grid(True)
+
+plt.tight_layout()
+plt.show()
+```
+
+In **Cluster 1** ist die Verteilung von RSRP und RSRQ stark konzentriert im Bereich von -108 dBm bis -104 dBm für RSRP und etwa -17.8 dB bis -17.0 dB für RSRQ. Diese extrem niedrigen Werte deuten auf eine schwache Signalqualität hin, möglicherweise in schlecht abgedeckten Bereichen.
+
+**Cluster 2** zeigt eine andere Verteilung mit einem Fokus im Bereich von -100 dBm bis -80 dBm für RSRP und -8 dB bis -12 dB für RSRQ. Dies deutet auf eine Gruppe von Hotels mit einer besseren Netzqualität hin, jedoch immer noch mit Schwächen im Bereich der RSRQ.
+
+**Interpretation**:
+
+- **Cluster 1**: Die RSRP- und RSRQ-Werte in diesem Cluster sind ebenfalls gut konzentriert, was eine gleichmäßige Netzabdeckung vermuten lässt.
+
+- **Cluster 2**: Dieser Cluster weist eine sehr gute Netzqualität auf, mit stabilen RSRP- und RSRQ-Werten, die sich in einem engen Bereich bewegen.
+```{python}
+#| label: thesis 3 - heatmap grid - part 3
+
+# Extrahiere die nächsten Cluster-Labels
+clusters = np.sort(geo_df['Cluster'].unique())[4:6]
+
+# Anzahl der Zeilen und Spalten für das Grid
+num_cols = 2
+num_rows = 1  # Nur eine Reihe für 2 Cluster
+
+# Erstelle eine Figure mit einem Grid von Subplots
+fig, axes = plt.subplots(num_rows, num_cols, figsize=(8, 4))
+axes = axes.flatten()
+
+# Erstellen von Heatmaps für jeden Cluster
+for i, cluster in enumerate(clusters):
+    cluster_data = geo_df[geo_df['Cluster'] == cluster]
+    
+    sns.kdeplot(
+        x=cluster_data['RSRP Avg (dBm)'],
+        y=cluster_data['RSRQ Avg (dB)'],
+        cmap='viridis', shade=True, thresh=0.05, ax=axes[i]
+    )
+    axes[i].set_title(f'Heatmap für Cluster {cluster}: RSRP und RSRQ')
+    axes[i].set_xlabel('RSRP (dBm)')
+    axes[i].set_ylabel('RSRQ (dB)')
+    axes[i].grid(True)
+
+plt.tight_layout()
+plt.show()
+```
+
+In **Cluster 3** ist die Verteilung von RSRP und RSRQ zwischen -126 dBm und -116 dBm für RSRP und -17.2 dB bis -16.0 dB für RSRQ verteilt. Diese Werte deuten auf einen Bereich mit mäßiger Netzqualität hin.
+
+**Cluster 4** zeigt eine Konzentration im Bereich von -118 dBm bis -112 dBm für RSRP und -19.8 dB bis -19.0 dB für RSRQ. Dieser Cluster weist extrem schlechte Netzqualität auf, was möglicherweise auf ländliche oder schlecht abgedeckte städtische Gebiete hinweist.
+
+**Intepretation**:
+
+- **Cluster 3**: Die Streuung der Werte ist in Cluster 3 etwas größer, was auf leichte Variabilität in der Netzabdeckung hinweist.
+
+- **Cluster 4**: Ähnlich wie Cluster 3 zeigt dieser Cluster eine größere Variabilität in den Werten, was auf Schwankungen in der Netzqualität hindeutet.
+```{python}
+#| label: thesis 3 - heatmap grid - part 4
+
+# Extrahiere die nächsten Cluster-Labels
+clusters = np.sort(geo_df['Cluster'].unique())[6:8]
+
+# Anzahl der Zeilen und Spalten für das Grid
+num_cols = 2
+num_rows = 1  # Nur eine Reihe für 2 Cluster
+
+# Erstelle eine Figure mit einem Grid von Subplots
+fig, axes = plt.subplots(num_rows, num_cols, figsize=(8, 4))
+axes = axes.flatten()
+
+# Erstellen von Heatmaps für jeden Cluster
+for i, cluster in enumerate(clusters):
+    cluster_data = geo_df[geo_df['Cluster'] == cluster]
+    
+    sns.kdeplot(
+        x=cluster_data['RSRP Avg (dBm)'],
+        y=cluster_data['RSRQ Avg (dB)'],
+        cmap='viridis', shade=True, thresh=0.05, ax=axes[i]
+    )
+    axes[i].set_title(f'Heatmap für Cluster {cluster}: RSRP und RSRQ')
+    axes[i].set_xlabel('RSRP (dBm)')
+    axes[i].set_ylabel('RSRQ (dB)')
+    axes[i].grid(True)
+
+plt.tight_layout()
+plt.show()
+```
+
+In **Cluster 5** reicht die Verteilung von RSRP und RSRQ von etwa -120 dBm bis -60 dBm für RSRP und von -12 dB bis -4 dB für RSRQ. Dieser Cluster zeigt eine signifikant verbesserte Signalqualität im Vergleich zu den vorherigen Clustern.
+
+**Cluster 6** hat eine ähnliche Verteilung, jedoch mit einer leicht geringeren Signalstärke, die sich von -120 dBm bis -60 dBm für RSRP und von -12 dB bis -4 dB für RSRQ erstreckt. Dieser Cluster weist ebenfalls eine recht gute Signalqualität auf.
+
+**Interpretation**:
+
+- **Cluster 5**: Dieser Cluster weist eine gute und relativ gleichmäßige Netzabdeckung auf, mit einer dichten Konzentration der Signalqualitätswerte.
+
+- **Cluster 6**: Die Netzqualität in diesem Cluster ist stabil und die Werte konzentrieren sich stark in einem bestimmten Bereich.
+```{python}
+#| label: thesis 3 - heatmap grid - part 5
+
+# Extrahiere die nächsten Cluster-Labels
+clusters = np.sort(geo_df['Cluster'].unique())[8:10]
+
+# Anzahl der Zeilen und Spalten für das Grid
+num_cols = 2
+num_rows = 1  # Nur eine Reihe für 2 Cluster
+
+# Erstelle eine Figure mit einem Grid von Subplots
+fig, axes = plt.subplots(num_rows, num_cols, figsize=(8, 4))
+axes = axes.flatten()
+
+# Erstellen von Heatmaps für jeden Cluster
+for i, cluster in enumerate(clusters):
+    cluster_data = geo_df[geo_df['Cluster'] == cluster]
+    
+    sns.kdeplot(
+        x=cluster_data['RSRP Avg (dBm)'],
+        y=cluster_data['RSRQ Avg (dB)'],
+        cmap='viridis', shade=True, thresh=0.05, ax=axes[i]
+    )
+    axes[i].set_title(f'Heatmap für Cluster {cluster}: RSRP und RSRQ')
+    axes[i].set_xlabel('RSRP (dBm)')
+    axes[i].set_ylabel('RSRQ (dB)')
+    axes[i].grid(True)
+
+plt.tight_layout()
+plt.show()
+```
+
+**Cluster 7** zeigt eine relativ gleichmäßige Verteilung der RSRP-Werte, die von -74 dBm bis -68 dBm reichen. RSRQ liegt in einem engen Bereich um -12 dB bis -13,75 dB. Die Netzqualität in diesem Cluster ist insgesamt gut, mit stabilen Werten.
+
+**Cluster 8** hat eine breitere Verteilung sowohl in RSRP (von -120 dBm bis -60 dBm) als auch in RSRQ (von -16 dB bis -4 dB). Dieser Cluster zeigt eine deutliche Streuung in der Netzqualität, wobei einige Bereiche deutlich bessere Signalstärken aufweisen als andere.
+
+**Interpreation**:
+
+- **Cluster 7**: Die Signalqualitätswerte in Cluster 7 sind relativ gut konzentriert, mit einer stabilen Netzabdeckung.
+
+- **Cluster 8**: Ähnlich wie Cluster 7 zeigt dieser Cluster eine stabile und gleichmäßige Verteilung der Signalqualitätswerte.
+```{python}
+#| label: thesis 3 - heatmap grid - part 6
+
+# Extrahiere die nächsten Cluster-Labels
+clusters = np.sort(geo_df['Cluster'].unique())[10:12]
+
+# Anzahl der Zeilen und Spalten für das Grid
+num_cols = 2
+num_rows = 1  # Nur eine Reihe für 2 Cluster
+
+# Erstelle eine Figure mit einem Grid von Subplots
+fig, axes = plt.subplots(num_rows, num_cols, figsize=(8, 4))
+axes = axes.flatten()
+
+# Erstellen von Heatmaps für jeden Cluster
+for i, cluster in enumerate(clusters):
+    cluster_data = geo_df[geo_df['Cluster'] == cluster]
+    
+    sns.kdeplot(
+        x=cluster_data['RSRP Avg (dBm)'],
+        y=cluster_data['RSRQ Avg (dB)'],
+        cmap='viridis', shade=True, thresh=0.05, ax=axes[i]
+    )
+    axes[i].set_title(f'Heatmap für Cluster {cluster}: RSRP und RSRQ')
+    axes[i].set_xlabel('RSRP (dBm)')
+    axes[i].set_ylabel('RSRQ (dB)')
+    axes[i].grid(True)
+
+plt.tight_layout()
+plt.show()
+```
+
+**Cluster 9** zeigt eine relativ eng fokussierte Verteilung der RSRP-Werte, die zwischen -66 dBm und -54 dBm liegen. Die RSRQ-Werte liegen im Bereich von -8 dB bis -6,25 dB, was auf eine insgesamt gute Netzqualität hinweist. Die Signalqualität in diesem Cluster ist sehr stabil, mit geringfügigen Schwankungen innerhalb der Clusterpunkte.
+
+**Cluster 10** zeigt eine breitere Verteilung der RSRP-Werte von -120 dBm bis -60 dBm, was auf eine größere Variabilität in der Netzqualität hindeutet. RSRQ liegt zwischen -16 dB und -6 dB, was ebenfalls eine deutliche Streuung der Signalqualitäten anzeigt.
+
+**Interpretation**:
+
+- **Cluster 9**: Dieser Cluster weist eine gute und gleichmäßige Netzqualität auf, wobei die RSRP- und RSRQ-Werte gut konzentriert sind.
+
+- **Cluster 10**: Cluster 10 zeigt eine etwas größere Variabilität der Werte, was auf leichte Schwankungen in der Netzqualität hindeutet.
+```{python}
+#| label: thesis 3 - heatmap grid - part 7
+
+# Extrahiere die nächsten Cluster-Labels
+clusters = np.sort(geo_df['Cluster'].unique())[12:14]
+
+# Anzahl der Zeilen und Spalten für das Grid
+num_cols = 2
+num_rows = 1  # Nur eine Reihe für 2 Cluster
+
+# Erstelle eine Figure mit einem Grid von Subplots
+fig, axes = plt.subplots(num_rows, num_cols, figsize=(8, 4))
+axes = axes.flatten()
+
+# Erstellen von Heatmaps für jeden Cluster
+for i, cluster in enumerate(clusters):
+    cluster_data = geo_df[geo_df['Cluster'] == cluster]
+    
+    sns.kdeplot(
+        x=cluster_data['RSRP Avg (dBm)'],
+        y=cluster_data['RSRQ Avg (dB)'],
+        cmap='viridis', shade=True, thresh=0.05, ax=axes[i]
+    )
+    axes[i].set_title(f'Heatmap für Cluster {cluster}: RSRP und RSRQ')
+    axes[i].set_xlabel('RSRP (dBm)')
+    axes[i].set_ylabel('RSRQ (dB)')
+    axes[i].grid(True)
+
+plt.tight_layout()
+plt.show()
+```
+
+**Cluster 11** weist eine breite Verteilung der RSRP-Werte von -120 dBm bis -60 dBm auf, wobei die meisten Punkte zwischen -100 dBm und -80 dBm konzentriert sind. Die RSRQ-Werte liegen zwischen -6 dB und -18 dB, was auf eine moderate Signalqualität hinweist. In diesem Cluster gibt es signifikante Unterschiede in der Signalqualität, da die Werte relativ stark gestreut sind.
+
+**Cluster 12** zeigt eine engere Verteilung der RSRP-Werte, die zwischen -82 dBm und -76 dBm liegen. Die RSRQ-Werte bewegen sich in einem kleineren Bereich, nämlich von -13 dB bis -16 dB. Dies deutet auf eine stabilere und tendenziell bessere Netzqualität innerhalb dieses Clusters hin, mit einer relativ engen Konzentration von Signalqualitätswerten.
+
+**Interpretation**:
+
+- **Cluster 11**: In diesem Cluster gibt es eine größere Streuung der RSRP- und RSRQ-Werte, was auf Variabilität in der Netzqualität hindeutet.
+
+- **Cluster 12**: Dieser Cluster zeigt eine engere Konzentration der Signalqualitätswerte, was auf eine gute Netzqualität hinweist.
+```{python}
+#| label: thesis 3 - heatmap grid - part 8
+
+# Extrahiere die Cluster-Labels für  den letzten Cluster
+clusters = np.sort(geo_df['Cluster'].unique())[14:15]
+
+# Anzahl der Zeilen und Spalten für das Grid
+# Da es nur einen Cluster gibt, setzen wir num_cols auf 1
+num_cols = 1  
+
+# Nur eine Reihe für diesen Cluster
+num_rows = 1  
+
+# Erstelle eine Figure mit einem Subplot
+fig, axes = plt.subplots(num_rows, num_cols, figsize=(4, 4))
+
+# Falls nur ein Cluster vorhanden ist, sicherstellen, dass die Achsen korrekt verwendet werden
+if len(clusters) == 1:
+    cluster_data = geo_df[geo_df['Cluster'] == clusters[0]]
+    sns.kdeplot(
+        x=cluster_data['RSRP Avg (dBm)'],
+        y=cluster_data['RSRQ Avg (dB)'],
+        cmap='viridis', fill=True, thresh=0.05, ax=axes
+    )
+    axes.set_title(f'Heatmap für Cluster {clusters[0]}: RSRP und RSRQ')
+    axes.set_xlabel('RSRP (dBm)')
+    axes.set_ylabel('RSRQ (dB)')
+    axes.grid(True)
+
+plt.tight_layout()
+plt.show()
+
+```
+
+Die Heatmap für **Cluster 13** zeigt eine relativ enge Konzentration der RSRP-Werte zwischen -108 dBm und -100 dBm. Die RSRQ-Werte liegen zwischen -6.8 dB und -7.2 dB, was auf eine stabile und mittlere Netzqualität in diesem Cluster hindeutet. Die enge Streuung der Werte deutet auf eine gleichmäßigere Verteilung der Netzqualität innerhalb dieses Clusters hin, ohne extreme Ausreißer.
+
+**Interpretation**:
+
+- **Cluster 13**: In Cluster 13 ist die Netzqualität stabil und die Werte konzentrieren sich stark in einem engen Bereich.
+
+Die Heatmaps verdeutlichen, dass sich die Signalqualitätsmetriken (RSRP und RSRQ) in bestimmten Bereichen stark konzentrieren. Cluster mit besseren Werten in der Netzqualität sind klar erkennbar und weisen eine höhere Dichte in spezifischen RSRP- und RSRQ-Bereichen auf. Die Darstellung der einzelnen Cluster hilft dabei, regionale Unterschiede in der Netzqualität zu identifizieren und gezielte Maßnahmen zur Standortoptimierung und Netzplanung zu treffen.
+
+### Schlussfolgerung
+Die räumliche Clusteranalyse mittels **DBSCAN** verdeutlicht, dass Hotels in geografischen Regionen mit ähnlicher Netzqualität gruppiert werden können. Dies legt nahe, dass Faktoren wie die Nähe zur Netzwerkinfrastruktur, die Siedlungsdichte oder städtebauliche Merkmale einen erheblichen Einfluss auf die Mobilfunkqualität haben. Hotels in dicht besiedelten Gebieten oder in der Nähe von Mobilfunkmasten tendieren dazu, in Clustern mit homogener Netzqualität zu erscheinen, was durch die Verteilung der Signalqualitätsmetriken unterstützt wird.
+
+**Fazit zu These 3**:
+
+Die Analyse bestätigt, dass es räumliche Cluster von Hotels gibt, die ähnliche Netzqualitätsmetriken aufweisen. Diese Cluster lassen sich geografisch bestimmten Regionen zuordnen, was auf die Bedeutung der Infrastruktur und Netzwerkanordnung in diesen Gebieten hinweist. Somit zeigt die Analyse, dass die Signalqualität durch lokale Gegebenheiten, wie die Nähe zu Mobilfunkmasten und die Bebauungsstruktur, beeinflusst wird. Diese Erkenntnisse können für die Netzplanung und Standortoptimierung genutzt werden, um die Netzabdeckung und -qualität gezielt zu verbessern.
 
 # Fazit und Ausblick
 ## Zusammenfassung

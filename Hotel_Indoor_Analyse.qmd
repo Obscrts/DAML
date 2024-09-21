@@ -631,14 +631,21 @@ print(f"Vor dem Entfernen der Ausreißer bei TA: {len(final_combined_df)} Eintr�
 print(f"Nach dem Entfernen der Ausreißer bei TA: {len(filtered_final_combined_df)} Einträge\n")
 ```
 
+```{python}
+#| label: cleaned TA histogram
+
 # Histogramm der bereinigten TA-Daten
-plt.figure(figsize=(8, 6))
+plt.figure(figsize=(9, 6))
 sns.histplot(filtered_final_combined_df['TA Avg (m)'], bins=30, kde=True)
 plt.title('Verteilung der bereinigten Timing Advance (TA) Werte')
 plt.xlabel('TA (m)')
 plt.ylabel('Anzahl')
 plt.grid(True)
 plt.show()
+```
+
+Nach dem Entfernen der Ausreißer zeigt das Histogramm eine gleichmäßigere Verteilung der TA-Werte. Die Verteilung reicht nun von 0 bis etwa 850 Meter. Die meisten Werte liegen zwischen 100 und 400 Metern, was auf eine typische Entfernung der Endgeräte zur Basisstation hindeutet. Die Häufigkeit der Werte nimmt nach 400 Metern deutlich ab.
+
 
 # Boxplot der bereinigten TA-Daten
 plt.figure(figsize=(10, 6))

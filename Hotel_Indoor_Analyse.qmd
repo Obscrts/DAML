@@ -831,15 +831,121 @@ Beide Scatterplots und die Pearson-Korrelationen zeigen, dass ein höheres **Tim
 
 **RSRP** zeigt einen etwas stärkeren Zusammenhang mit **TA** als **RSRQ**, was darauf hindeuten könnte, dass die Signalstärke stärker von der Entfernung zur Basisstation abhängt als die Signalqualität (**RSRQ**), welche möglicherweise durch weitere Faktoren wie Interferenzen beeinflusst wird.
 
-# Modellierung und Vorhersagen
-## Zielvariable festlegen
-Bestimmung der zu modellierenden Zielvariable, z.B. RSRP oder RSRQ.
 
-## Modellauswahl
-Auswahl geeigneter Machine-Learning-Modelle wie lineare Regression, Entscheidungsbäume oder Random Forest.
+## These 2: Hotels mit hoher Datenübertragungsrate (DL/UL Throughput) zeigen eine bessere Signalqualität (RSRP, RSRQ)
+### Korrelation von Throughput und Signalqualität
+```{python}
+#| label: thesis 2 - scatterplots
 
-## Modelltraining und Evaluierung
-Training und Evaluierung der Modelle auf Basis der Daten, z.B. mit Kreuzvalidierung und Metriken wie R² und MSE.
+# Normalisierung für das Mapping
+norm = Normalize(vmin=new_filtered_final_combined_df['DL Throughput Avg (Mbps)'].min(), vmax=new_filtered_final_combined_df['DL Throughput Avg (Mbps)'].max())
+
+# Erstellen der Figur mit 2 untereinanderliegenden Plots
+plt.figure(figsize=(8, 12))
+
+# Plot für DL Throughput vs. RSRP
+plt.subplot(2, 1, 1)
+points = plt.scatter(
+    x=new_filtered_final_combined_df['DL Throughput Avg (Mbps)'],
+    y=new_filtered_final_combined_df['RSRP Avg (dBm)'],
+    c=new_filtered_final_combined_df['DL Throughput Avg (Mbps)'], 
+    cmap='coolwarm', alpha=0.7, s=20, edgecolor='w'
+)
+sns.regplot(x='DL Throughput Avg (Mbps)', y='RSRP Avg (dBm)', data=new_filtered_final_combined_df, scatter=False, color="red", line_kws={"linewidth":1.5})
+plt.title('DL Throughput vs. RSRP (eingefärbt nach Throughput)')
+plt.xlabel('DL Throughput Avg (Mbps)')
+plt.ylabel('RSRP (dBm)')
+cbar = plt.colorbar(points, label='DL Throughput (Mbps)')
+
+# Plot für DL Throughput vs. RSRQ
+plt.subplot(2, 1, 2)
+points = plt.scatter(
+    x=new_filtered_final_combined_df['DL Throughput Avg (Mbps)'],
+    y=new_filtered_final_combined_df['RSRQ Avg (dB)'],
+    c=new_filtered_final_combined_df['DL Throughput Avg (Mbps)'], 
+    cmap='coolwarm', alpha=0.7, s=20, edgecolor='w'
+)
+sns.regplot(x='DL Throughput Avg (Mbps)', y='RSRQ Avg (dB)', data=new_filtered_final_combined_df, scatter=False, color="red", line_kws={"linewidth":1.5})
+plt.title('DL Throughput vs. RSRQ (eingefärbt nach Throughput)')
+plt.xlabel('DL Throughput Avg (Mbps)')
+plt.ylabel('RSRQ (dB)')
+cbar = plt.colorbar(points, label='DL Throughput (Mbps)')
+plt.tight_layout()
+plt.show()
+```
+
+Beide Scatterplots zeigen eine leichte Verbesserung der Signalqualität bei zunehmender Datenübertragungsrate. Diese positive Korrelation wird durch die Regressionslinie angezeigt, welche nach oben geneigt ist. Hotels mit höherer Datenübertragungsrate tendieren also dazu, eine bessere Netzqualität in Bezug auf RSRP und RSRQ aufzuweisen. Die farbliche Darstellung nach Durchsatz unterstreicht diese Erkenntnis.
+
+Trotz dieser Tendenz bleibt die Korrelation relativ gering. Dies könnte darauf hinweisen, dass neben der Datenübertragungsrate auch andere Faktoren wie Interferenzen, Netzwerkauslastung oder die physische Umgebung der Hotels eine wichtige Rolle für die Signalqualität spielen.
+
+### Clusteranalyse der Signalqualität
+```{python}
+#| label: thesis 2 - cluster analysis
+
+# Features: RSRP und RSRQ
+X = new_filtered_final_combined_df[['RSRP Avg (dBm)', 'RSRQ Avg (dB)']].dropna()
+
+# KMeans Clustering mit 4 Clustern
+kmeans = KMeans(n_clusters=4, random_state=0).fit(X)
+
+# Erstelle eine leere Spalte für die Cluster und fülle sie mit NaN
+new_filtered_final_combined_df['Cluster'] = np.nan
+
+# Weise die Cluster-Labels nur den Zeilen ohne NaN zu
+new_filtered_final_combined_df.loc[X.index, 'Cluster'] = kmeans.labels_
+
+# Cluster-Namen zuweisen
+cluster_names = {0: 'Sehr Schlecht', 1: 'Schlecht', 2: 'Gut', 3: 'Sehr Gut'}
+new_filtered_final_combined_df['Cluster Name'] = new_filtered_final_combined_df['Cluster'].map(cluster_names)
+
+# Visualisierung der Clustere
+plt.figure(figsize=(9, 6))
+sns.scatterplot(x='RSRP Avg (dBm)', y='RSRQ Avg (dB)', hue='Cluster Name', data=new_filtered_final_combined_df, palette='flare', alpha=0.6)
+plt.title('K-Means Cluster-Analyse: Signalqualität')
+plt.xlabel('RSRP (dBm)')
+plt.ylabel('RSRQ (dB)')
+
+# Benennen der Legende
+plt.legend(title="Cluster", loc='upper left')
+
+plt.show()
+```
+
+Die Clusteranalyse zeigt vier deutlich abgegrenzte Gruppen, die verschiedene Bereiche der Signalqualität in Hotels darstellen.
+
+- **Cluster "Sehr Gut" (gelb)** umfasst Hotels mit den besten Signalwerten. Diese Standorte liegen in Bereichen, in denen die Netzqualität am höchsten ist.
+
+- **Cluster "Gut" (orange)** umfasst Hotels mit guten Signalwerten, die zwar nicht die besten, aber immer noch solide Netzwerkbedingungen aufweisen.
+
+- **Cluster "Schlecht" (dunkelviolett)** zeigt Hotels, die sich in Bereichen mit schlechter Signalqualität befinden. Diese Hotels haben suboptimale Netzbedingungen.
+
+- **Cluster "Sehr Schlecht" (lila)** repräsentiert Hotels mit der niedrigsten Signalqualität. Diese Cluster liegen in Regionen mit stark beeinträchtigtem Netzempfang.
+
+Diese Cluster weisen darauf hin, dass es signifikante Unterschiede in der Netzqualität gibt, die möglicherweise geographische oder infrastrukturelle Ursachen haben.
+
+### Konzentration der Signalqualität
+```{python}
+#| label: thesis 2 - heatmap
+
+plt.figure(figsize=(9, 6))
+
+# Heatmap für RSRP vs RSRQ
+sns.kdeplot(
+    x=new_filtered_final_combined_df['RSRP Avg (dBm)'],
+    y=new_filtered_final_combined_df['RSRQ Avg (dB)'],
+    cmap='Reds', shade=True, thresh=0.05
+)
+plt.title('Heatmap für RSRP und RSRQ')
+plt.xlabel('RSRP (dBm)')
+plt.ylabel('RSRQ (dB)')
+plt.show()
+```
+
+Die Heatmap verdeutlicht die Konzentration der Datenpunkte in einem Bereich schlechter bis mittlerer Signalqualität (RSRP zwischen -140 und -80 dBm, RSRQ zwischen -14 und -10 dB). Dies zeigt, dass viele Hotels immer noch in Zonen mit suboptimaler Netzqualität liegen, was sich auch in den durchschnittlich niedrigeren Throughput-Werten widerspiegeln könnte.
+
+### Schlussfolgerung
+Die Daten bestätigen teilweise die These, da eine höhere Datenübertragungsrate mit einer Verbesserung der Signalqualität in Bezug auf RSRP und RSRQ korreliert. Dennoch ist die Korrelation nicht besonders stark. Dies deutet darauf hin, dass weitere Faktoren wie Netzwerkauslastung, geografische Lage und die Struktur der Umgebung einen erheblichen Einfluss auf die Signalqualität haben.
+
 
 # Fazit und Ausblick
 ## Zusammenfassung

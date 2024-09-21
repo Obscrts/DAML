@@ -726,7 +726,7 @@ In diesem Schritt entfernen wir alle potenziellen Duplikate im Datensatz, die m�
 
 # Überprüfen, ob Duplikate im Datensatz vorhanden sind
 duplicate_count = new_filtered_final_combined_df.duplicated().sum()
-print(f"Anzahl der Duplikate im Datensatz: {duplicate_count}")
+print(f"Anzahl der Duplikate im Datensatz: {duplicate_count}\n")
 
 # Falls Duplikate vorhanden sind, werden diese entfernt
 if duplicate_count > 0:

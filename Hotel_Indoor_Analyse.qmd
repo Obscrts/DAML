@@ -773,10 +773,13 @@ display(na_counts_after)
 ```
 
 ## Bivariate Analyse: Zusammenhang zwischen Timing Advance (TA) und Signalqualität (RSRP, RSRQ)
-In diesem Abschnitt untersuchen wir den Zusammenhang zwischen **Timing Advance (TA)** und den Signalqualitätsmetriken **RSRP** (Reference Signal Received Power) und **RSRQ** (Reference Signal Received Quality). Wir erwarten, dass ein höheres Timing Advance, welches eine größere Entfernung zwischen dem Mobilfunkgerät und der Basisstation anzeigt, zu einer schlechteren Signalqualität führt.
+
+### These 1: Hotels mit höherem Timing Advance (TA) haben im Durchschnitt eine schlechtere Signalqualität (RSRP, RSRQ)
+
+In diesem Abschnitt wird untersucht, ob Hotels mit einem höheren Timing Advance (TA) im Durchschnitt eine schlechtere Signalqualität (RSRP und RSRQ) aufweisen. Der Timing Advance gibt die Entfernung des Mobilfunkgeräts zur Basisstation an. Es wird erwartet, dass bei größerer Entfernung zur Basisstation die Signalqualität abnimmt.
 
 ### Scatterplot TA vs. RSRP
-Der folgende Scatterplot zeigt den Zusammenhang zwischen **Timing Advance (TA)** und **RSRP**. Hier wird deutlich, dass bei zunehmendem TA-Wert der RSRP-Wert abnimmt, was auf eine Verschlechterung der empfangenen Signalstärke hindeutet.
+Der folgende Scatterplot zeigt den Zusammenhang zwischen **Timing Advance (TA)** und **RSRP**. Es wird deutlich, dass bei zunehmendem TA-Wert der RSRP-Wert abnimmt, was auf eine Verschlechterung der empfangenen Signalstärke hindeutet.
 ```{python}
 #| label: scatterplot ta and rsrp
 
@@ -795,10 +798,6 @@ plt.show()
 pearson_corr_ta_rsrp = new_filtered_final_combined_df['TA Avg (m)'].corr(new_filtered_final_combined_df['RSRP Avg (dBm)'])
 print(f"Pearson-Korrelation TA vs. RSRP: {pearson_corr_ta_rsrp}")
 ```
-
-- **Beobachtung**: Ein deutlich negativer Trend ist erkennbar. Mit zunehmendem Timing Advance verschlechtert sich die Signalstärke (niedrigere RSRP-Werte). Die Punkte konzentrieren sich hauptsächlich im Bereich niedriger TA-Werte, während bei höheren TA-Werten eine geringere Dichte vorliegt.
-
-- **Pearson-Korrelation**: Die Pearson-Korrelation zwischen TA und RSRP beträgt etwa **-0.53**, was auf einen mittleren, aber signifikanten negativen Zusammenhang hinweist. Dieser Korrelationswert zeigt, dass größere Entfernungen (höheres TA) mit schlechterem Empfang (niedrigere RSRP-Werte) einhergehen.
 
 ### Scatterplot TA vs. RSRQ
 Dieser Scatterplot visualisiert den Zusammenhang zwischen **Timing Advance (TA)** und **RSRQ**. Auch hier ist ein negativer Trend erkennbar, wenn auch weniger ausgeprägt als beim Zusammenhang zwischen **TA** und **RSRP**.

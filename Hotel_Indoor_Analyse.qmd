@@ -961,7 +961,7 @@ with open('resources/scripts/grid_search.py') as file:
     code = file.read()
 
 # Den Code ausführen
-#exec(code)
+exec(code)
 ```
 
 **Kreuzvalidierung zur Evaluierung der Modellleistung**

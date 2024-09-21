@@ -768,7 +768,7 @@ final_combined_df[numeric_columns] = final_combined_df[numeric_columns].fillna(f
 
 # Überprüfen, ob noch fehlende Werte vorhanden sind
 na_counts_after = final_combined_df.isnull().sum()
-print(na_counts_after)
+display(na_counts_after)
 ```
 
 ## Bivariate Analyse: Zusammenhang zwischen Timing Advance (TA) und Signalqualität (RSRP, RSRQ)

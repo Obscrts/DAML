@@ -627,8 +627,9 @@ upper_bound_ta = Q3_ta + 1.5 * IQR_ta
 filtered_final_combined_df = final_combined_df[(final_combined_df['TA Avg (m)'] >= lower_bound_ta) & (final_combined_df['TA Avg (m)'] <= upper_bound_ta)]
 
 # Anzeigen der bereinigten Daten
-print(f"Vor dem Entfernen der Ausreißer bei TA: {len(final_combined_df)} Einträge")
-print(f"Nach dem Entfernen der Ausreißer bei TA: {len(filtered_final_combined_df)} Einträge")
+print(f"Vor dem Entfernen der Ausreißer bei TA: {len(final_combined_df)} Einträge\n")
+print(f"Nach dem Entfernen der Ausreißer bei TA: {len(filtered_final_combined_df)} Einträge\n")
+```
 
 # Histogramm der bereinigten TA-Daten
 plt.figure(figsize=(8, 6))

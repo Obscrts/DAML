@@ -746,7 +746,7 @@ Wir verwenden die Methode `.isnull()` in Kombination mit `.sum()`, um zu überpr
 
 # Überprüfen, wie viele fehlende Werte es in jeder Spalte gibt
 na_counts = new_filtered_final_combined_df.isnull().sum()
-print(na_counts)
+display(na_counts)
 ```
 
 ### Umgang mit fehlenden Werten

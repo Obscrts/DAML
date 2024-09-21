@@ -1398,7 +1398,43 @@ Die Analyse bestätigt, dass es räumliche Cluster von Hotels gibt, die ähnlich
 
 # Fazit und Ausblick
 ## Zusammenfassung
-Zusammenfassung der wichtigsten Erkenntnisse aus der Analyse und Modellierung.
+In dieser Analyse wurde untersucht, welche Faktoren die Mobilfunknetzqualität, insbesondere die Signalstärke (RSRP) und die Signalqualität (RSRQ), in und um Hotels in verschiedenen deutschen Städten beeinflussen. Hierbei wurden sowohl die eigentlichen Hotelbereiche als auch deren erweiterte Umgebung (Buffered Polygons) betrachtet. Die Analyse umfasste mehrere Schritte, von der Datenbereinigung und Univariate Analyse bis hin zur Bivariaten und Multivariaten Analyse mit Hilfe von Linearen Regressionen und Random Forest Modellen.
+
+**Wichtige Erkenntnisse**:
+
+- **Timing Advance (TA) als Prädiktor für die Signalqualität**:
+
+    - Die bivariate Analyse zeigte, dass ein höheres TA tendenziell mit einer schlechteren Signalstärke (RSRP) und einer etwas schlechteren Signalqualität (RSRQ) einhergeht.
+
+    - Die Pearson-Korrelation zwischen TA und RSRP war moderat negativ (-0.53), während der Zusammenhang zwischen TA und RSRQ schwächer war (-0.35).
+
+- **Polygonflächen und ihre Rolle**:
+
+    - Die Größe der Polygone (area_m2) zeigte in der multivariaten Analyse einen signifikanten Einfluss auf die Signalqualität. Größere Flächen scheinen mit besseren RSRP-Werten korreliert zu sein.
+
+- **Random Forest als leistungsstarkes Modell**:
+
+    - Während die lineare Regression nur etwa 33% der Varianz der RSRP-Werte erklären konnte, verbesserte der Einsatz eines Random Forest Regressors die Vorhersageleistung erheblich, sodass bis zu 54% der Varianz erklärt werden konnten.
+
+    - Der Mean Squared Error (MSE) konnte durch den Random Forest ebenfalls deutlich reduziert werden.
+
+- **Hyperparameter-Tuning**:
+
+    - Durch den Einsatz von **GridSearchCV** konnte das Random Forest Modell weiter optimiert werden. Es wäre jedoch sinnvoll, **RandomizedSearchCV** in zukünftigen Schritten zu testen, um zu prüfen, ob dieser Ansatz effizienter ist und möglicherweise vergleichbare oder sogar bessere Ergebnisse als GridSearchCV in kürzerer Zeit liefern könnte.
 
 ## Ausblick
-Diskussion möglicher Erweiterungen der Analyse und weiterer Schritte.
+Die durchgeführte Analyse hat wichtige Einblicke in die Faktoren geliefert, die die Signalqualität in und um Hotels beeinflussen. Basierend auf den bisherigen Ergebnissen gibt es mehrere Ansätze, die für zukünftige Analysen in Betracht gezogen werden sollten:
+
+- **Erweiterung der Datengrundlage**: Die Datenbasis könnte durch die Einbeziehung zusätzlicher Städte oder neuer Messkampagnen erweitert werden. Dadurch könnten regionale Unterschiede in der Netzqualität genauer untersucht werden.
+
+- **Detaillierte Untersuchung der räumlichen Einflüsse**: Die GeoJSON-Daten bieten Potenzial für eine noch detailliertere räumliche Analyse. Insbesondere könnten räumliche Clusterbildungen von Hotels mit ähnlicher Netzqualität weiter erforscht werden.
+
+- **Integration weiterer Mobilfunkmetriken**: Neben TA, RSRP und RSRQ gibt es eine Vielzahl weiterer Mobilfunkmetriken, die Aufschluss über die Netzqualität geben können, wie z.B. die CQI (Channel Quality Indicator) oder die RRC Connection Setup Failure Rate. Deren Einbeziehung in die multivariate Analyse könnte das Modell weiter verbessern.
+
+- **Testen weiterer Machine-Learning-Modelle**: Neben der Random Forest Regression könnten auch andere fortschrittliche Machine-Learning-Modelle wie Gradient Boosting oder XGBoost getestet werden, um die Vorhersagegenauigkeit weiter zu steigern.
+
+- **Effizienzsteigerung durch RandomizedSearchCV**: Um die Effizienz der Hyperparameteroptimierung zu verbessern, könnte RandomizedSearchCV als schnellerer und ressourcenschonender Ansatz eingesetzt werden. Dieser könnte in kürzerer Zeit zu vergleichbaren oder sogar besseren Ergebnissen führen als der klassische GridSearch-Ansatz.
+
+- **Simulationsbasierte Analysen**: Es wäre interessant, Simulationen durchzuführen, um die Auswirkungen von Netzwerkänderungen zu testen, z.B. durch das Hinzufügen neuer Basisstationen oder die Änderung der Netzwerkkonfigurationen. Dies könnte praktische Hinweise für die Optimierung des Mobilfunknetzes in Hotels und umliegenden Gebieten liefern.
+
+Insgesamt bietet die Analyse eine solide Grundlage für die Untersuchung der Netzqualität in Hotels und deren Umgebung. Weitere Analysen könnten dazu beitragen, noch präzisere Empfehlungen für die Verbesserung der Mobilfunkinfrastruktur zu entwickeln.

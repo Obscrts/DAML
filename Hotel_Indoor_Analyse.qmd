@@ -700,6 +700,8 @@ plt.show()
 
 Nach der Entfernung der Ausreißer mithilfe der **Interquartilsabstand (IQR)-Methode** zeigt sich eine bereinigte Verteilung der Polygonflächen. Wie im Histogramm erkennbar, hat sich der Bereich der Polygonflächen deutlich eingegrenzt, wobei die meisten Flächen unter 1000 m² liegen. Auch die abnehmende Häufigkeit bei größeren Flächen ist ersichtlich, wobei die Verteilung insgesamt nun homogener erscheint.
 
+```{python}
+#| label: cleaned area boxplot
 
 # Boxplot der bereinigten Polygonflächen
 plt.figure(figsize=(10, 6))
@@ -709,6 +711,8 @@ plt.xlabel('Fläche (m²)')
 plt.grid(True)
 plt.show()
 ```
+
+Der Boxplot verdeutlicht die Range der bereinigten Polygonflächen nach der Entfernung der Ausreißer. Während der Großteil der Flächen unterhalb von 1000 m² bleibt, gibt es dennoch einige größere Polygone, die als weniger starke Ausreißer markiert sind. Die Verteilung der Flächen ist jetzt besser fokussiert, was eine stabilere Basis für die weitere Analyse bietet.
 
 ### Entfernen von Duplikaten
 In diesem Schritt entfernen wir alle potenziellen Duplikate im Datensatz, die möglicherweise bei der Kombination von normalem und gepuffertem Polygon-Datensatz entstanden sind. Dies ist wichtig, um sicherzustellen, dass keine doppelten Einträge die Analyse verfälschen.

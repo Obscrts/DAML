@@ -681,8 +681,9 @@ upper_bound = Q3 + 1.5 * IQR
 new_filtered_final_combined_df = filtered_final_combined_df[(final_combined_df['area_m2'] >= lower_bound) & (final_combined_df['area_m2'] <= upper_bound)]
 
 # Anzeigen der bereinigten Daten
-print(f"Vor dem Entfernen der Ausreißer: {len(filtered_final_combined_df)} Polygone")
-print(f"Nach dem Entfernen der Ausreißer: {len(new_filtered_final_combined_df)} Polygone")
+print(f"Vor dem Entfernen der Ausreißer: {len(filtered_final_combined_df)} Polygone\n")
+print(f"Nach dem Entfernen der Ausreißer: {len(new_filtered_final_combined_df)} Polygone\n")
+```
 
 # Histogramm der bereinigten Polygonflächen
 plt.figure(figsize=(8, 6))

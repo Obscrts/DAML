@@ -830,6 +830,176 @@ Beide Scatterplots und die Pearson-Korrelationen zeigen, dass ein höheres **Tim
 
 **RSRP** zeigt einen etwas stärkeren Zusammenhang mit **TA** als **RSRQ**, was darauf hindeuten könnte, dass die Signalstärke stärker von der Entfernung zur Basisstation abhängt als die Signalqualität (**RSRQ**), welche möglicherweise durch weitere Faktoren wie Interferenzen beeinflusst wird.
 
+**Fazit zu These 1**:
+
+Die Ergebnisse bestätigen die These, dass ein höheres **Timing Advance (TA)** zu einer schlechteren Signalqualität führt. Der negative Zusammenhang zwischen TA und den Signalqualitätsmetriken (insbesondere **RSRP**) ist signifikant und unterstützt die Annahme, dass größere Entfernungen zur Basisstation die Signalstärke negativ beeinflussen.
+
+## Multivariate Analyse
+In diesem Abschnitt der Analyse betrachten wir den Einfluss mehrerer Variablen auf die Signalqualität (RSRP, RSRQ). Während die vorherige **bivariate Analyse** nur den Zusammenhang zwischen zwei Variablen untersucht hat (z.B. TA vs. RSRP), werden wir in der **multivariaten Analyse** mehrere unabhängige Variablen in Kombination untersuchen, um ein umfassenderes Bild über die Einflussfaktoren auf die Signalqualität zu gewinnen.
+
+### Ziel
+Das Ziel der multivariaten Analyse besteht darin, den Einfluss von **Timing Advance (TA)**, der **Polygonfläche (area_m2)** und anderen unabhängigen Variablen auf die **RSRP** und **RSRQ** Werte zu bestimmen. Dazu werden wir verschiedene Modelle zur Vorhersage der Signalqualität testen und evaluieren.
+
+### Vorbereitung der Daten
+Bevor wir mit der Modellierung beginnen, müssen wir sicherstellen, dass die Daten korrekt vorbereitet sind. Dazu gehören Schritte wie:
+
+- **Normalisierung oder Standardisierung** der Features
+- **Auswahl relevanter Features** für die Modellierung
+- **Aufteilung in Trainings- und Testdaten**
+```{python}
+#| label: prepare dataset for modeling
+
+# Auswahl relevanter Features für die Modellierung
+features = ['TA Avg (m)', 'area_m2', 'DL Throughput Avg (Mbps)', 'UL Throughput Avg (Mbps)']
+
+# Zielvariable (z.B. RSRP)
+target_rsrp = new_filtered_final_combined_df['RSRP Avg (dBm)']
+
+# Entfernen von Zeilen mit NaN-Werten in den Features oder der Zielvariable
+df_model = new_filtered_final_combined_df[features + ['RSRP Avg (dBm)']].dropna()
+
+# Datenaufteilung in Trainings- und Testdatensatz
+X_train, X_test, y_train, y_test = train_test_split(df_model[features], df_model['RSRP Avg (dBm)'], test_size=0.2, random_state=42)
+
+# Imputer für fehlende Werte mit Median
+from sklearn.impute import SimpleImputer
+imputer = SimpleImputer(strategy='median')
+
+# Anwenden des Imputers auf die Trainingsdaten
+X_train_imputed = imputer.fit_transform(X_train)
+X_test_imputed = imputer.transform(X_test)
+
+# Normalisierung der imputierten Daten
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train_imputed)
+X_test_scaled = scaler.transform(X_test_imputed)
+```
+
+### Lineare Regression
+Als erstes Modell verwenden wir eine einfache lineare Regression, um zu prüfen, wie gut sich die RSRP-Werte auf Basis der unabhängigen Variablen vorhersagen lassen.
+```{python}
+#| label: linear regression model
+
+# Lineares Regressionsmodell
+model = LinearRegression()
+model.fit(X_train_scaled, y_train)
+
+# Vorhersage der Testdaten
+y_pred = model.predict(X_test_scaled)
+
+# Berechnung des Mean Squared Error (MSE) und des R²-Werts
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+# Ergebnisse anzeigen
+print(f'Mean Squared Error: {mse}')
+print(f'R²-Wert: {r2}')
+```
+
+**Interpretation**:
+
+Der Mean Squared Error (MSE) zeigt an, wie stark die vorhergesagten RSRP-Werte im Durchschnitt von den tatsächlichen Werten abweichen. Ein niedrigerer MSE deutet auf ein besseres Modell hin. Das **R² von 0.3324** weist darauf hin, dass die lineare Regression nur etwa **33.24% der Varianz der Zielvariable** erklären kann. Dies deutet darauf hin, dass das Modell nur begrenzt in der Lage ist, die RSRP-Werte genau vorherzusagen.
+
+### Random Forest Regressor
+Um die Vorhersageleistung zu verbessern, setzen wir als nächstes einen Random Forest Regressor ein, der auf mehreren Entscheidungsbäumen basiert und in der Lage ist, komplexe Zusammenhänge in den Daten zu modellieren.
+```{python}
+#| label: random forest model
+
+# Random Forest Regressor Modell
+rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+rf_model.fit(X_train_scaled, y_train)
+
+# Vorhersage der Testdaten
+y_pred_rf = rf_model.predict(X_test_scaled)
+
+# Berechnung des Mean Squared Error (MSE) und des R²-Werts
+mse_rf = mean_squared_error(y_test, y_pred_rf)
+r2_rf = r2_score(y_test, y_pred_rf)
+
+# Ergebnisse anzeigen
+print(f'Random Forest Mean Squared Error: {mse_rf}')
+print(f'Random Forest R²-Wert: {r2_rf}')
+```
+
+**Interpretation**:
+
+Der Random Forest Regressor zeigt eine deutliche Verbesserung gegenüber der linearen Regression, jedoch mit Einschränkungen. Mit einem **R²-Wert von 0.5378** kann das Modell etwa **53.78%** der Varianz der RSRP-Werte erklären. Der **Mean Squared Error (MSE)** liegt bei **40.14**, was auf eine moderate Genauigkeit des Modells hinweist. Während der Random Forest durch seine Fähigkeit, nicht-lineare Beziehungen besser abzubilden, eine bessere Leistung zeigt, ist die Vorhersagegenauigkeit noch nicht optimal.
+
+### Hyperparameter-Tuning
+In diesem Abschnitt betrachten wir eine erweiterte Analyse, bei der wir die Leistung des Random Forest Modells durch eine Feinabstimmung der Hyperparameter weiter verbessern. 
+
+#### Hyperparameter in Random Forest
+Hyperparameter sind Parameter, die vor dem Training des Modells festgelegt werden und nicht durch den Lernalgorithmus selbst gelernt werden. Für Random Forest gibt es eine Vielzahl von Hyperparametern, die die Modellleistung stark beeinflussen können. Zu den wichtigsten Hyperparametern gehören:
+
+- **n_estimators**: Die Anzahl der Bäume im Wald. Eine größere Anzahl von Bäumen kann die Genauigkeit des Modells verbessern, aber auch die Rechenzeit verlängern.
+
+- **max_depth**: Die maximale Tiefe der Bäume. Dies begrenzt, wie tief jeder Entscheidungsbaum wachsen kann. Eine zu große Tiefe kann zu einem überangepassten Modell führen.
+
+- **min_samples_split**: Die minimale Anzahl von Stichproben, die erforderlich ist, um einen Knoten in zwei Teile zu teilen. Kleinere Werte können dazu führen, dass der Baum mehr Knoten bildet und genauer auf die Trainingsdaten passt.
+
+- **min_samples_leaf**: Die minimale Anzahl von Stichproben, die erforderlich ist, um ein Blatt zu bilden. Ein höherer Wert kann zu einem robusteren Modell führen, das weniger stark auf die Trainingsdaten abgestimmt ist.
+
+#### Grid Search zur Hyperparameter-Optimierung
+Um den besten Satz an Hyperparametern zu finden, verwenden wir **Grid Search**. Grid Search ist ein systematischer Ansatz zur Erprobung aller möglichen Kombinationen von Hyperparametern, die in einem vordefinierten Raster definiert sind. Das Modell wird mit jedem Satz von Hyperparametern trainiert und auf Basis der Vorhersagegenauigkeit bewertet.
+
+Hier führen wir Grid Search durch, um die folgenden Hyperparameter zu optimieren:
+
+- `n_estimators`: Anzahl der Bäume
+- `max_depth`: Maximale Tiefe der Bäume
+- `min_samples_split`: Minimale Stichprobengröße zum Teilen eines Knotens
+
+**Implementierung von Grid Search**
+
+Im Folgenden ist der Python-Code, der die Implementierung von Grid Search für unser Random Forest Modell zeigt. Wir nutzen die `GridSearchCV`-Funktion von `scikit-learn`, um das Modell mit verschiedenen Hyperparameter-Kombinationen zu trainieren.
+```{python}
+#| label: hyperparameter tuning - grid search
+```
+
+**Kreuzvalidierung zur Evaluierung der Modellleistung**
+
+In der oben stehenden Grid Search nutzen wir 5-fache Kreuzvalidierung (Cross Validation), um die Leistung des Modells zu bewerten. Dabei wird der Datensatz in 5 gleich große Teile aufgeteilt. In jedem Durchlauf werden 4 Teile zum Trainieren verwendet, während der fünfte Teil zur Validierung genutzt wird. Dieser Vorgang wird fünfmal wiederholt, sodass jeder Teil einmal als Validierungsdatensatz verwendet wird.
+
+Die Verwendung von Kreuzvalidierung stellt sicher, dass das Modell nicht nur auf den Trainingsdaten gut funktioniert, sondern auch auf bisher ungesehenen Daten eine gute Leistung erbringt. Nach Abschluss der Kreuzvalidierung wird der Durchschnitt der Evaluationsmetriken (z.B. MSE, R²) berechnet, um die allgemeine Leistung des Modells zu beurteilen.
+
+**Optimierungsergebnisse und Interpretation**
+
+Die Grid Search führte zu einer verbesserten Modellleistung durch die Auswahl der optimalen Kombination von Hyperparametern. Das Modell wurde unter Berücksichtigung der besten Kombinationen von n_estimators, max_depth und min_samples_split erneut trainiert. Die besten Parameter, die durch Grid Search gefunden wurden, sind:
+
+- `max_depth`: None
+- `min_samples_split`: 10
+- `n_estimators`: 200
+
+Das optimierte Modell erzielte folgende Ergebnisse:
+
+- **Mean Squared Error (MSE)**: 39.86
+- **R²-Wert:** 0.5411
+
+**Interpretation**: 
+
+Das optimierte Modell zeigt eine leicht verbesserte Leistung im Vergleich zum ursprünglichen Modell ohne Hyperparameter-Optimierung. Der **MSE** von **39.86** deutet auf eine moderate Verbesserung hin, während der **R²-Wert von 0.5411** zeigt, dass das Modell nun etwa **54.11%** der Varianz der Zielvariable erklären kann. Dies zeigt, dass die Feinabstimmung der Hyperparameter eine Verbesserung der Modellleistung ermöglicht, wenn auch nicht dramatisch.
+
+### Fazit der multivariaten Analyse
+Die multivariate Analyse zeigt, dass sowohl **Timing Advance (TA)** als auch die **Polygonfläche (area_m2)** signifikante Prädiktoren für die Signalqualität (RSRP) sind. Das eingesetzte **Random Forest Modell** konnte durch die Abbildung nicht-linearer Zusammenhänge eine bessere Vorhersagegenauigkeit im Vergleich zu einer einfachen linearen Regression erzielen.
+
+Zusätzlich konnte die Modellleistung durch ein gezieltes Hyperparameter-Tuning mittels Grid Search weiter verbessert werden. Die besten Parameter, die durch Grid Search gefunden wurden, sind:
+
+- `max_depth`: None
+- `min_samples_split`: 10
+- `n_estimators`: 200
+
+Das optimierte Modell erzielte folgende Ergebnisse:
+
+- **Mean Squared Error (MSE)**: **39.86**
+- **R²-Wert**: **0.5411**
+
+**Interpretation**: 
+
+Das optimierte Modell zeigt eine deutliche Verbesserung im Vergleich zu den initialen Ergebnissen. Der **R²-Wert von 0.5411** bedeutet, dass das Modell nun etwa **54.11% der Varianz der RSRP-Werte** erklären kann. Dies zeigt, dass die zusätzliche Feinabstimmung der Hyperparameter eine positive Wirkung auf die Modellleistung hatte.
+
+# Untersuchung der Thesen
+In diesem Abschnitt werden die aufgestellten Thesen untersucht, um zu überprüfen, ob die initialen Hypothesen durch die vorhandenen Daten gestützt werden. Jede These wird auf Basis einer detaillierten Analyse der verfügbaren Metriken, der geographischen Daten sowie statistischer Modelle getestet. Die Thesen beinhalten sowohl quantitative als auch qualitative Aspekte der Netzqualität in und um Hotels in verschiedenen deutschen Städten. 
+
+Die erste These wurde bereits im Abschnitt der Explorativen Datenanalyse (EDA) untersucht und beantwortet. Nun konzentrieren wir uns auf die verbleibenden Thesen:
 
 ## These 2: Hotels mit hoher Datenübertragungsrate (DL/UL Throughput) zeigen eine bessere Signalqualität (RSRP, RSRQ)
 ### Korrelation von Throughput und Signalqualität

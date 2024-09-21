@@ -953,6 +953,15 @@ Hier führen wir Grid Search durch, um die folgenden Hyperparameter zu optimiere
 Im Folgenden ist der Python-Code, der die Implementierung von Grid Search für unser Random Forest Modell zeigt. Wir nutzen die `GridSearchCV`-Funktion von `scikit-learn`, um das Modell mit verschiedenen Hyperparameter-Kombinationen zu trainieren.
 ```{python}
 #| label: hyperparameter tuning - grid search
+
+# Hinweis: Das Skript ist hier nicht geschrieben, sondern befindet sich in einer externen Datei, damit ich für Textzwecke den Code einfacher auskommentieren kann.
+
+# Den Inhalt des Skripts lesen
+with open('resources/scripts/grid_search.py') as file:
+    code = file.read()
+
+# Den Code ausführen
+#exec(code)
 ```
 
 **Kreuzvalidierung zur Evaluierung der Modellleistung**

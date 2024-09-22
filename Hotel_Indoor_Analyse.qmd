@@ -1349,7 +1349,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-In **Cluster 1** ist die Verteilung von RSRP und RSRQ stark konzentriert im Bereich von -108 dBm bis -104 dBm für RSRP und etwa -17.8 dB bis -17.0 dB für RSRQ. Diese extrem niedrigen Werte deuten auf eine schwache Signalqualität hin, möglicherweise in schlecht abgedeckten Bereichen.
+In **Cluster 1** ist die Verteilung von RSRP und RSRQ stark konzentriert im Bereich von -108 dBm bis -104 dBm für RSRP und etwa -17,8 dB bis -17,0 dB für RSRQ. Diese extrem niedrigen Werte deuten auf eine schwache Signalqualität hin, möglicherweise in schlecht abgedeckten Bereichen.
 
 **Cluster 2** zeigt eine andere Verteilung mit einem Fokus im Bereich von -100 dBm bis -80 dBm für RSRP und -8 dB bis -12 dB für RSRQ. Dies deutet auf eine Gruppe von Hotels mit einer besseren Netzqualität hin, jedoch immer noch mit Schwächen im Bereich der RSRQ.
 
@@ -1390,9 +1390,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-In **Cluster 3** ist die Verteilung von RSRP und RSRQ zwischen -126 dBm und -116 dBm für RSRP und -17.2 dB bis -16.0 dB für RSRQ verteilt. Diese Werte deuten auf einen Bereich mit mäßiger Netzqualität hin.
+In **Cluster 3** ist die Verteilung von RSRP und RSRQ zwischen -125 dBm und -117 dBm für RSRP und -17,2 dB bis -16,2 dB für RSRQ verteilt. Diese Werte deuten auf einen Bereich mit mäßiger Netzqualität hin.
 
-**Cluster 4** zeigt eine Konzentration im Bereich von -118 dBm bis -112 dBm für RSRP und -19.8 dB bis -19.0 dB für RSRQ. Dieser Cluster weist extrem schlechte Netzqualität auf, was möglicherweise auf ländliche oder schlecht abgedeckte städtische Gebiete hinweist.
+**Cluster 4** zeigt eine Konzentration im Bereich von -117 dBm bis -113 dBm für RSRP und -19,6 dB bis -19,0 dB für RSRQ. Dieser Cluster weist extrem schlechte Netzqualität auf, was möglicherweise auf ländliche oder schlecht abgedeckte städtische Gebiete hinweist.
 
 **Intepretation**:
 
@@ -1431,9 +1431,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-In **Cluster 5** reicht die Verteilung von RSRP und RSRQ von etwa -120 dBm bis -60 dBm für RSRP und von -12 dB bis -4 dB für RSRQ. Dieser Cluster zeigt eine signifikant verbesserte Signalqualität im Vergleich zu den vorherigen Clustern.
+In **Cluster 5** reicht die Verteilung von RSRP und RSRQ von etwa -110 dBm bis -70 dBm für RSRP und von -12 dB bis -7 dB für RSRQ. Dieser Cluster zeigt eine signifikant verbesserte Signalqualität im Vergleich zu den vorherigen Clustern.
 
-**Cluster 6** hat eine ähnliche Verteilung, jedoch mit einer leicht geringeren Signalstärke, die sich von -120 dBm bis -60 dBm für RSRP und von -12 dB bis -4 dB für RSRQ erstreckt. Dieser Cluster weist ebenfalls eine recht gute Signalqualität auf.
+**Cluster 6** hat eine ähnliche Verteilung, jedoch mit einer leicht geringeren Signalstärke, die sich von -110 dBm bis -80 dBm für RSRP und von -12 dB bis -7 dB für RSRQ erstreckt. Dieser Cluster weist ebenfalls eine recht gute Signalqualität auf.
 
 **Interpretation**:
 
@@ -1472,9 +1472,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Cluster 7** zeigt eine relativ gleichmäßige Verteilung der RSRP-Werte, die von -74 dBm bis -68 dBm reichen. RSRQ liegt in einem engen Bereich um -12 dB bis -13,75 dB. Die Netzqualität in diesem Cluster ist insgesamt gut, mit stabilen Werten.
+**Cluster 7** zeigt eine relativ gleichmäßige Verteilung der RSRP-Werte, die von -73 dBm bis -69 dBm reichen. RSRQ liegt in einem engen Bereich um -12,25 dB bis -13,75 dB. Die Netzqualität in diesem Cluster ist insgesamt gut, mit stabilen Werten.
 
-**Cluster 8** hat eine breitere Verteilung sowohl in RSRP (von -120 dBm bis -60 dBm) als auch in RSRQ (von -16 dB bis -4 dB). Dieser Cluster zeigt eine deutliche Streuung in der Netzqualität, wobei einige Bereiche deutlich bessere Signalstärken aufweisen als andere.
+**Cluster 8** hat eine breitere Verteilung sowohl in RSRP (von -110 dBm bis -70 dBm) als auch in RSRQ (von -13 dB bis -6 dB). Dieser Cluster zeigt eine deutliche Streuung in der Netzqualität, wobei einige Bereiche deutlich bessere Signalstärken aufweisen als andere.
 
 **Interpreation**:
 
@@ -1513,9 +1513,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Cluster 9** zeigt eine relativ eng fokussierte Verteilung der RSRP-Werte, die zwischen -66 dBm und -54 dBm liegen. Die RSRQ-Werte liegen im Bereich von -8 dB bis -6,25 dB, was auf eine insgesamt gute Netzqualität hinweist. Die Signalqualität in diesem Cluster ist sehr stabil, mit geringfügigen Schwankungen innerhalb der Clusterpunkte.
+**Cluster 9** zeigt eine relativ eng fokussierte Verteilung der RSRP-Werte, die zwischen -65 dBm und -56 dBm liegen. Die RSRQ-Werte liegen im Bereich von -7,75 dB bis -6,5 dB, was auf eine insgesamt gute Netzqualität hinweist. Die Signalqualität in diesem Cluster ist sehr stabil, mit geringfügigen Schwankungen innerhalb der Clusterpunkte.
 
-**Cluster 10** zeigt eine breitere Verteilung der RSRP-Werte von -120 dBm bis -60 dBm, was auf eine größere Variabilität in der Netzqualität hindeutet. RSRQ liegt zwischen -16 dB und -6 dB, was ebenfalls eine deutliche Streuung der Signalqualitäten anzeigt.
+**Cluster 10** zeigt eine breitere Verteilung der RSRP-Werte von -110 dBm bis -70 dBm, was auf eine größere Variabilität in der Netzqualität hindeutet. RSRQ liegt zwischen -13 dB und -6 dB, was ebenfalls eine deutliche Streuung der Signalqualitäten anzeigt.
 
 **Interpretation**:
 
@@ -1554,7 +1554,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Cluster 11** weist eine breite Verteilung der RSRP-Werte von -120 dBm bis -60 dBm auf, wobei die meisten Punkte zwischen -100 dBm und -80 dBm konzentriert sind. Die RSRQ-Werte liegen zwischen -6 dB und -18 dB, was auf eine moderate Signalqualität hinweist. In diesem Cluster gibt es signifikante Unterschiede in der Signalqualität, da die Werte relativ stark gestreut sind.
+**Cluster 11** weist eine breite Verteilung der RSRP-Werte von -120 dBm bis -70 dBm auf, wobei die meisten Punkte zwischen -100 dBm und -80 dBm konzentriert sind. Die RSRQ-Werte liegen zwischen -6 dB und -18 dB, was auf eine moderate Signalqualität hinweist. In diesem Cluster gibt es signifikante Unterschiede in der Signalqualität, da die Werte relativ stark gestreut sind.
 
 **Cluster 12** zeigt eine engere Verteilung der RSRP-Werte, die zwischen -82 dBm und -76 dBm liegen. Die RSRQ-Werte bewegen sich in einem kleineren Bereich, nämlich von -13 dB bis -16 dB. Dies deutet auf eine stabilere und tendenziell bessere Netzqualität innerhalb dieses Clusters hin, mit einer relativ engen Konzentration von Signalqualitätswerten.
 

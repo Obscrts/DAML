@@ -1,7 +1,5 @@
 # Hotel Indoor Analyse
 
-![Telekom Logo](resources/images/logo/telekom.png) ![FHDW Logo](resources/images/logo/fhdw.png)
-
 ## Übersicht
 
 Dieses Projekt analysiert die Mobilfunknetzqualität innerhalb und um Hotels in verschiedenen deutschen Städten, die Austragungsorte der Fußball-Europameisterschaft 2024 waren. Das Ziel ist es, die Netzabdeckung und -leistung durch eine detaillierte Untersuchung von Metriken wie Timing Advance (TA), RSRP (Reference Signal Received Power), RSRQ (Reference Signal Received Quality) und weiteren Mobilfunkkennzahlen zu bewerten. 

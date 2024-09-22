@@ -24,6 +24,7 @@ format:
     toc-float: true
     number-sections: true
     smooth-scroll: true
+    code-tools: true
     code-fold: true
     code-summary: "Code anzeigen"
     code-links:

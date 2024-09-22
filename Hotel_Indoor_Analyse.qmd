@@ -1229,12 +1229,46 @@ Städte wie **Hamburg (HH)** und **Frankfurt (FFM)** weisen eine größere Streu
 In südlicheren Regionen, wie **Stuttgart (STG)** und **München (MUC)**, gibt es klare räumliche Unterschiede in der Netzabdeckung, was durch die Clusterfarbe angezeigt wird.
 
 ### Clusteranalyse der Signalqualität
-Die DBSCAN-Analyse zeigt, wie die Hotels geografisch in Cluster unterteilt werden, basierend auf der Nähe und ähnlichen Signalqualitätsmetriken (RSRP, RSRQ). Die Hotels in denselben geografischen Regionen tendieren dazu, ähnliche Netzqualität aufzuweisen.
+Die **DBSCAN-Analyse** zeigt, wie die Hotels geografisch in Cluster unterteilt werden, basierend auf der Nähe und ähnlichen Signalqualitätsmetriken (RSRP, RSRQ). Die Hotels in denselben geografischen Regionen tendieren dazu, ähnliche Netzqualität aufzuweisen.
 ```{python}
+#| label: thesis 3 - cluster signal quality
 
+# Auswahl der relevanten Spalten für die Clusteranalyse
+features = ['RSRP Avg (dBm)', 'RSRQ Avg (dB)']
+X = new_filtered_final_combined_df[features].dropna()
+
+# Skalieren der Daten
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# K-Means Clustering mit 4 Clustern
+kmeans = KMeans(n_clusters=4, random_state=42)
+X['Cluster'] = kmeans.fit_predict(X_scaled)
+
+# Visualisierung der Cluster mit kleineren Punkten und höherer Transparenz
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x=X['RSRP Avg (dBm)'], y=X['RSRQ Avg (dB)'], hue=X['Cluster'], 
+# Punktgröße auf 20 reduziert, Transparenz erhöht
+palette='viridis', alpha=0.5, s=20)
+plt.title('K-Means Cluster-Analyse der Signalqualität')
+plt.xlabel('RSRP Avg (dBm)')
+plt.ylabel('RSRQ Avg (dB)')
+plt.legend(title='Cluster')
+
+# Cluster-Zentren als größere, markante Punkte einzeichnen
+centers = scaler.inverse_transform(kmeans.cluster_centers_)
+plt.scatter(centers[:, 0], centers[:, 1], c='black', s=200, alpha=0.75, marker='X', label='Cluster-Zentren')
+
+plt.grid(True)
+plt.show()
+
+# Anzeige der Cluster-Zentren
+cluster_centers = pd.DataFrame(scaler.inverse_transform(kmeans.cluster_centers_), columns=features)
+print("\nCluster-Zentren:")
+display(cluster_centers)
 ```
 
-Dieser Abschnitt erstellt eine visuelle Darstellung der Signalqualitätsmetriken (RSRP und RSRQ), um zu veranschaulichen, wie sich die verschiedenen Cluster in Bezug auf die Netzqualität verhalten. Die Farben der Cluster zeigen Hotels, die ähnliche Signalqualität aufweisen und räumlich nahe beieinander liegen.
+Dieser Abschnitt erstellt eine visuelle Darstellung der Signalqualitätsmetriken RSRP und RSRQ, um zu veranschaulichen, wie sich die verschiedenen Cluster in Bezug auf die Netzqualität verhalten. Die Farben der Cluster zeigen Hotels, die ähnliche Signalqualität aufweisen und räumlich nahe beieinander liegen.
 
 ### Konzentration der Signalqualität
 Die nachfolgende Heatmap zeigt die Dichteverteilung der beiden Metriken **RSRP** (Reference Signal Received Power) und **RSRQ** (Reference Signal Received Quality) für alle identifizierten Cluster aus der DBSCAN-Analyse. Diese Visualisierung gibt einen Überblick über die Signalqualität in den verschiedenen Clustern.

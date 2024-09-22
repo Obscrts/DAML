@@ -917,9 +917,27 @@ y_pred_rf = rf_model.predict(X_test_scaled)
 mse_rf = mean_squared_error(y_test, y_pred_rf)
 r2_rf = r2_score(y_test, y_pred_rf)
 
-# Ergebnisse anzeigen
-print(f'Random Forest Mean Squared Error: {mse_rf}')
+# Wichtigkeit der Features anzeigen
+feature_importances = rf_model.feature_importances_
+features_df = pd.DataFrame({
+    'Feature': X_train.columns,
+    'Importance': feature_importances
+}).sort_values(by='Importance', ascending=False)
+
+# Ergebnisdarstellung
+print(f'Random Forest Mean Squared Error (MSE): {mse_rf}')
 print(f'Random Forest R²-Wert: {r2_rf}')
+print("\nFeature Importances:")
+display(features_df)
+
+# Zeige ein paar Test-Vorhersagen vs. tatsächliche Werte
+comparison_df = pd.DataFrame({
+    'Tatsächliche Werte': y_test,
+    'Vorhersagen': y_pred_rf,
+}).head(10)
+
+print("\nVergleich der ersten 10 Vorhersagen mit den tatsächlichen Werten:")
+display(comparison_df)
 ```
 
 **Interpretation**:

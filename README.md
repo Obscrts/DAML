@@ -54,7 +54,7 @@ Um das Projekt lokal auszuführen, musst du Python 3.x und die erforderlichen Bi
 
 2. **Erstellen und Aktivieren eines virtuellen Environments**
 
-Erstelle ein virtuelles Environment, um die benötigten Abhängigkeiten zu installieren:
+    Erstelle ein virtuelles Environment, um die benötigten Abhängigkeiten zu installieren:
 
     ```bash
     python -m venv venv
@@ -74,7 +74,7 @@ Erstelle ein virtuelles Environment, um die benötigten Abhängigkeiten zu insta
 
 3. **Abhängigkeiten installieren**
 
-Installiere die benötigten Bibliotheken mit der Datei requirements.txt:
+    Installiere die benötigten Bibliotheken mit der Datei requirements.txt:
 
     ```bash
     pip install -r requirements.txt
@@ -82,7 +82,7 @@ Installiere die benötigten Bibliotheken mit der Datei requirements.txt:
 
 4. **Starten der Analyse**
 
-Führe die Jupyter-Notebook oder die Quarto-Datei aus, um die Analyse zu starten:
+    Führe die Jupyter-Notebook oder die Quarto-Datei aus, um die Analyse zu starten:
 
     ```bash
     quarto preview

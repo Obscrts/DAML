@@ -1237,7 +1237,45 @@ Die DBSCAN-Analyse zeigt, wie die Hotels geografisch in Cluster unterteilt werde
 Dieser Abschnitt erstellt eine visuelle Darstellung der Signalqualitätsmetriken (RSRP und RSRQ), um zu veranschaulichen, wie sich die verschiedenen Cluster in Bezug auf die Netzqualität verhalten. Die Farben der Cluster zeigen Hotels, die ähnliche Signalqualität aufweisen und räumlich nahe beieinander liegen.
 
 ### Konzentration der Signalqualität
-Die nachfolgenden Heatmaps zeigen die Dichteverteilung der beiden Metriken **RSRP** (Reference Signal Received Power) und **RSRQ** (Reference Signal Received Quality) für verschiedene Cluster, die in der DBSCAN-Analyse identifiziert wurden. Diese Verteilung gibt Aufschluss darüber, wie die Signalqualität in den verschiedenen Clustern verteilt ist.
+Die nachfolgende Heatmap zeigt die Dichteverteilung der beiden Metriken **RSRP** (Reference Signal Received Power) und **RSRQ** (Reference Signal Received Quality) für alle identifizierten Cluster aus der DBSCAN-Analyse. Diese Visualisierung gibt einen Überblick über die Signalqualität in den verschiedenen Clustern.
+```{python}
+#| label: thesis 3 - all clusters in one plot
+
+# Extrahiere die eindeutigen Cluster-Labels
+clusters = np.sort(geo_df['Cluster'].unique())
+
+# Erstelle eine Figure für das gesamte Diagramm
+plt.figure(figsize=(7, 7))
+
+# Erstellen von Heatmaps für alle Cluster auf einem Plot
+for cluster in clusters:
+    cluster_data = geo_df[geo_df['Cluster'] == cluster]
+    
+    sns.kdeplot(
+        x=cluster_data['RSRP Avg (dBm)'],
+        y=cluster_data['RSRQ Avg (dB)'],
+        # Füge Cluster-Label hinzu
+        label=f'Cluster {cluster}',
+        # Transparente Füllung für bessere Sichtbarkeit
+        fill=True, thresh=0.05, alpha=0.5,
+        cmap='viridis',  
+    )
+
+# Titel und Beschriftungen anpassen
+plt.title('Heatmap für alle Cluster: RSRP und RSRQ', fontsize=14, pad=20)
+plt.xlabel('RSRP (dBm)', fontsize=12)
+plt.ylabel('RSRQ (dB)', fontsize=12)
+plt.legend(title="Cluster")
+plt.grid(True)
+
+# Zeige das Diagramm
+plt.tight_layout()
+plt.show()
+```
+
+In dieser Heatmap sehen wir die Signalverteilung für alle Cluster gleichzeitig. Obwohl diese Darstellung einen ersten Überblick ermöglicht, zeigt sich, dass es aufgrund der Überlagerungen schwierig ist, genaue Unterschiede zwischen den Clustern zu erkennen. Dies liegt daran, dass die Cluster teilweise ähnliche Wertebereiche für RSRP und RSRQ aufweisen, was eine genaue Interpretation erschwert.
+
+Um die spezifischen Signalqualitäten in den einzelnen Clustern besser zu verstehen, betrachten wir im Folgenden die Cluster separat. Dies ermöglicht eine detailliertere Analyse der Unterschiede in der Signalqualität und bietet präzisere Einblicke in die Netzabdeckung und -leistung für die jeweiligen Hotelstandorte.
 ```{python}
 #| label: thesis 3 - heatmap grid - part 1
 

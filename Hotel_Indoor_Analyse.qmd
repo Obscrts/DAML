@@ -942,7 +942,13 @@ display(comparison_df)
 
 **Interpretation**:
 
-Der Random Forest Regressor zeigt eine deutliche Verbesserung gegenüber der linearen Regression, jedoch mit Einschränkungen. Mit einem **R²-Wert von 0.5378** kann das Modell etwa **53.78%** der Varianz der RSRP-Werte erklären. Der **Mean Squared Error (MSE)** liegt bei **40.14**, was auf eine moderate Genauigkeit des Modells hinweist. Während der Random Forest durch seine Fähigkeit, nicht-lineare Beziehungen besser abzubilden, eine bessere Leistung zeigt, ist die Vorhersagegenauigkeit noch nicht optimal.
+Der **Random Forest Regressor** zeigt eine deutliche Verbesserung gegenüber der linearen Regression, jedoch mit Einschränkungen. Mit einem **R²-Wert von 0.5378** kann das Modell etwa **53.78%** der Varianz der RSRP-Werte erklären. Der **Mean Squared Error (MSE)** liegt bei **40.14**, was auf eine moderate Genauigkeit des Modells hinweist. 
+
+Während der Random Forest durch seine Fähigkeit, nicht-lineare Beziehungen besser abzubilden, eine bessere Leistung zeigt, ist die Vorhersagegenauigkeit noch nicht optimal. Das Modell konnte die wichtigen Features identifizieren, wobei **Timing Advance (TA)** und die **Fläche (area_m2)** den größten Einfluss auf die Signalqualität hatten.
+
+**Nächster Schritt: Hyperparameter-Tuning**
+
+Um die Vorhersageleistung weiter zu verbessern, wird im nächsten Schritt ein **Hyperparameter-Tuning** durchgeführt. Dies wird helfen, die optimalen Parameter des Random Forest Modells zu finden, um die Performance zu maximieren und die Vorhersagegenauigkeit zu erhöhen. Der Einsatz von Techniken wie **GridSearchCV** wird dabei unterstützen, die besten Einstellungen für das Modell zu identifizieren.
 
 ### Hyperparameter-Tuning
 In diesem Abschnitt betrachten wir eine erweiterte Analyse, bei der wir die Leistung des Random Forest Modells durch eine Feinabstimmung der Hyperparameter weiter verbessern. 

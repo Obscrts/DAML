@@ -1260,7 +1260,11 @@ annotated_clusters = set()
 
 # Annotation der Cluster-Zentren mit Stadtnamen und Cluster-ID
 for idx, row in cluster_centers.iterrows():
-    city_name = cluster_cities.get(idx, 'Unbekannt')  # Falls kein gültiger Eintrag, setze 'Unbekannt'
+    city_name = cluster_cities.get(idx, 'Unbekannt')  
+    
+    # Überspringe die Annotation für die Stadt HH (Hamburg)
+    if city_name == 'HH':
+        continue
     
     # Prüfe, ob die Stadt bereits annotiert wurde
     if city_name not in annotated_clusters:

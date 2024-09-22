@@ -4,7 +4,8 @@
 
 /.jupyter_cache
 
-resources/data
+resources/data/buffered
+resources/data/normal
 
 *.html
 *.tex

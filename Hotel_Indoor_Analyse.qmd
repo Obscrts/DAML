@@ -1254,18 +1254,15 @@ for cluster in clusters:
     sns.kdeplot(
         x=cluster_data['RSRP Avg (dBm)'],
         y=cluster_data['RSRQ Avg (dB)'],
-        # Füge Cluster-Label hinzu
-        label=f'Cluster {cluster}',
         # Transparente Füllung für bessere Sichtbarkeit
         fill=True, thresh=0.05, alpha=0.5,
         cmap='viridis',  
     )
 
 # Titel und Beschriftungen anpassen
-plt.title('Heatmap für alle Cluster: RSRP und RSRQ', fontsize=14, pad=20)
+plt.title('Heatmap der Cluster: RSRP und RSRQ', fontsize=14, pad=20)
 plt.xlabel('RSRP (dBm)', fontsize=12)
 plt.ylabel('RSRQ (dB)', fontsize=12)
-plt.legend(title="Cluster")
 plt.grid(True)
 
 # Zeige das Diagramm

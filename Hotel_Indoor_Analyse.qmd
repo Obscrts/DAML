@@ -1012,6 +1012,34 @@ Das optimierte Modell erzielte folgende Ergebnisse:
 
 Das optimierte Modell zeigt eine leicht verbesserte Leistung im Vergleich zum ursprünglichen Modell ohne Hyperparameter-Optimierung. Der **MSE** von **39.86** deutet auf eine moderate Verbesserung hin, während der **R²-Wert von 0.5411** zeigt, dass das Modell nun etwa **54.11%** der Varianz der Zielvariable erklären kann. Dies zeigt, dass die Feinabstimmung der Hyperparameter eine Verbesserung der Modellleistung ermöglicht, wenn auch nicht dramatisch.
 
+**Modellkritik**:
+
+Das optimierte Random Forest Regressor Modell zeigt eine Verbesserung im Vergleich zur ersten Version, jedoch gibt es immer noch Raum für Verbesserungen. Die wichtigsten Merkmale, die das Modell zur Vorhersage der RSRP-Werte verwendet, sind:
+
+- **TA Avg (m)** mit einer Feature Importance von 0.5014
+- **area_m2** mit 0.2373
+- **UL Throughput Avg (Mbps)** mit 0.1347
+- **DL Throughput Avg (Mbps)** mit 0.1265
+
+Die **Mean Squared Error (MSE)** für das optimierte Modell beträgt **40.14**, was auf eine moderate Genauigkeit hinweist. Der **R²-Wert** des optimierten Modells liegt bei **0.5378**, was bedeutet, dass das Modell etwa 53.78% der Varianz der RSRP-Werte erklären kann.
+
+Ein Vergleich der ersten 10 Vorhersagen mit den tatsächlichen Werten zeigt, dass das Modell in der Lage ist, nahe an den tatsächlichen Werten zu bleiben, aber immer noch leichte Abweichungen aufweist:
+
+| Tatsächliche Werte | Vorhersagen |
+|-------------------|-------------|
+| -92.58            | -94.951445  |
+| -91.77            | -101.756767 |
+| -107.32           | -105.438797 |
+| -82.68            | -81.499588  |
+| -109.56           | -103.349861 |
+| -99.70            | -99.110335  |
+| -95.66            | -85.759765  |
+| -89.90            | -94.992429  |
+| -93.01            | -90.486213  |
+| -95.90            | -85.665773  |
+
+Während das Modell durch das Hyperparameter-Tuning in seiner Leistung verbessert wurde, zeigt es immer noch Abweichungen, insbesondere bei extremen Werten. Daher könnte ein weiteres Finetuning des Modells notwendig sein, um bessere Vorhersagen zu erzielen.
+
 ### Fazit der multivariaten Analyse
 Die multivariate Analyse zeigt, dass sowohl **Timing Advance (TA)** als auch die **Polygonfläche (area_m2)** signifikante Prädiktoren für die Signalqualität (RSRP) sind. Das eingesetzte **Random Forest Modell** konnte durch die Abbildung nicht-linearer Zusammenhänge eine bessere Vorhersagegenauigkeit im Vergleich zu einer einfachen linearen Regression erzielen.
 

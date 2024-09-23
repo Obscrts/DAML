@@ -1276,6 +1276,17 @@ for idx, row in cluster_centers.iterrows():
                     fontsize=10, color='black', weight='bold', 
                     bbox=dict(boxstyle="round,pad=0.3", edgecolor='black', facecolor='white'),
                     arrowprops=dict(facecolor='black', arrowstyle='->', lw=1))
+
+# Manuelle Hinzufügung des "HH" Labels für Hamburg
+# Da Hamburg sich niht automatisch zuordnen ließ
+ax.annotate('HH', 
+            xy=(98000, 5920000),  # Setze hier die Koordinaten für die Position von "HH"
+            xytext=(3, 3),  # Text leicht verschieben, um Überlappung zu vermeiden
+            textcoords='offset points', 
+            fontsize=10, color='black', weight='bold', 
+            bbox=dict(boxstyle="round,pad=0.3", edgecolor='black', facecolor='white'),
+            arrowprops=dict(facecolor='black', arrowstyle='->', lw=1))
+
 plt.show()
 ```
 
